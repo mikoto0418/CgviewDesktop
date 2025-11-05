@@ -2195,3 +2195,64 @@
   background-color: rgba(15, 23, 42, 0.9) !important;
   color: rgba(226, 232, 240, 0.95) !important;
 }
+
+/* 可拖拽调整大小的分栏面板 */
+.resizable-panel {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+  overflow: hidden;
+}
+
+.resizable-panel-left,
+.resizable-panel-right {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.resizable-divider {
+  width: 8px;
+  height: 100%;
+  background: rgba(148, 163, 184, 0.15);
+  border-left: 1px solid rgba(148, 163, 184, 0.2);
+  border-right: 1px solid rgba(148, 163, 184, 0.2);
+  cursor: col-resize;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.resizable-divider:hover {
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.resizable-divider.dragging {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+.resizable-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.resize-arrow {
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 16px;
+  font-weight: bold;
+  user-select: none;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+}
+
+.resizable-divider:hover .resize-arrow {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.resizable-divider.dragging .resize-arrow {
+  color: rgba(59, 130, 246, 0.9);
+}

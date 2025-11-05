@@ -4,6 +4,7 @@ import { CgviewViewer } from '../../components/CgviewViewer';
 import { LayerConfigPanel } from '../../components/layers/LayerConfigPanel';
 import { FeatureFilterPanel } from '../../components/filters/FeatureFilterPanel';
 import { PlotTrackManager } from '../visualization/PlotTrackManager';
+import { ResizablePanel } from '../../components/ui/ResizablePanel';
 import type { DatasetDetail } from '@shared/parser/types';
 
 type LayerVisibility = {
@@ -46,6 +47,49 @@ export const EnhancedWorkspaceView = ({
   const [layers, setLayers] = useState<LayerVisibility[]>([]);
   const [filter, setFilter] = useState<FilterCriteria | null>(null);
   const [plotTracks, setPlotTracks] = useState<PlotTrack[]>([]);
+
+  // 调试信息 - 帮助排查问题
+  console.log('[EnhancedWorkspaceView] dataset:', dataset);
+  console.log('[EnhancedWorkspaceView] features count:', dataset?.features?.length || 0);
+
+  // 如果没有数据集，返回空状态
+  if (!dataset) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        color: 'rgba(148, 163, 184, 0.8)',
+        fontSize: '1.1rem'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
+          <p>请先选择一个数据集以开始可视化</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果数据集没有特征，返回提示
+  if (!dataset.features || dataset.features.length === 0) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        color: 'rgba(148, 163, 184, 0.8)',
+        fontSize: '1.1rem'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+          <p>数据集中没有找到特征数据</p>
+          <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>请检查数据文件格式或重新导入</p>
+        </div>
+      </div>
+    );
+  }
 
   // Filter dataset based on filter criteria
   const filteredDataset = useMemo(() => {
@@ -463,106 +507,117 @@ export const EnhancedWorkspaceView = ({
     };
   };
 
-  return (
-    <div className="workspace-enhanced-layout">
-      {/* 左侧可视化区域 - 固定不滚动 */}
-      <div className="workspace-visualization">
-        <div className="workspace-visualization-header">
-          <h2 className="workspace-visualization-title">
-            🧬 基因组可视化
-          </h2>
-        </div>
-        <div className="workspace-visualization-content">
-          <div className="workspace-viewer-container">
-            <CgviewViewer
-              dataset={{
-                ...visualizedDataset,
-                plotTracks: computedPlotTracks
-              }}
-              width={700}
-              height={700}
-              showLegend={true}
-            />
-          </div>
-        </div>
+  // 构建左侧面板内容
+  const leftPanelContent = (
+    <div className="workspace-visualization">
+      <div className="workspace-visualization-header">
+        <h2 className="workspace-visualization-title">
+          🧬 基因组可视化
+        </h2>
       </div>
-
-      {/* 右侧控制面板 - 可独立滚动 */}
-      <div className="workspace-controls">
-        <div className="workspace-controls-scroll">
-          {/* 标签页导航 */}
-          <nav className="enhanced-tabs-nav enhanced-tabs-nav-sticky">
-            <button
-              className={activeTab === 'layers' ? 'active' : ''}
-              onClick={() => setActiveTab('layers')}
-            >
-              🎨 {t('tabs.layers')}
-            </button>
-            <button
-              className={activeTab === 'filters' ? 'active' : ''}
-              onClick={() => setActiveTab('filters')}
-            >
-              🔍 {t('tabs.filters')}
-            </button>
-            <button
-              className={activeTab === 'plots' ? 'active' : ''}
-              onClick={() => setActiveTab('plots')}
-            >
-              📈 {t('tabs.plots')}
-            </button>
-          </nav>
-
-          {/* 标签页内容 */}
-          <div className="enhanced-tab-content">
-            {activeTab === 'layers' && (
-              <LayerConfigPanel
-                dataset={filteredDataset}
-                onLayerChange={setLayers}
-              />
-            )}
-            {activeTab === 'filters' && (
-              <FeatureFilterPanel
-                dataset={dataset}
-                onFilterChange={setFilter}
-              />
-            )}
-            {activeTab === 'plots' && (
-              <PlotTrackManager
-                dataset={dataset}
-                onTracksChange={setPlotTracks}
-              />
-            )}
-          </div>
-
-          {/* 统计信息 */}
-          {filteredDataset && (
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-value">{visualizedDataset.features.length}</div>
-                <div className="stat-label">
-                  {t('stats.showing')} {t('stats.features')}
-                </div>
-              </div>
-              {filter && (
-                <div className="stat-card">
-                  <div className="stat-value">
-                    {dataset.features.length - filteredDataset.features.length}
-                  </div>
-                  <div className="stat-label">
-                    {t('stats.filtered')}
-                  </div>
-                </div>
-              )}
-              <div className="stat-card">
-                <div className="stat-value">
-                  {dataset.totalLength.toLocaleString()}
-                </div>
-                <div className="stat-label">{t('stats.totalLength')}</div>
-              </div>
-            </div>
-          )}
+      <div className="workspace-visualization-content">
+        <div className="workspace-viewer-container">
+          <CgviewViewer
+            dataset={{
+              ...visualizedDataset,
+              plotTracks: computedPlotTracks
+            }}
+            width={700}
+            height={700}
+            showLegend={true}
+          />
         </div>
       </div>
     </div>
+  );
+
+  // 构建右侧面板内容
+  const rightPanelContent = (
+    <div className="workspace-controls">
+      <div className="workspace-controls-scroll">
+        {/* 标签页导航 */}
+        <nav className="enhanced-tabs-nav enhanced-tabs-nav-sticky">
+          <button
+            className={activeTab === 'layers' ? 'active' : ''}
+            onClick={() => setActiveTab('layers')}
+          >
+            🎨 {t('tabs.layers')}
+          </button>
+          <button
+            className={activeTab === 'filters' ? 'active' : ''}
+            onClick={() => setActiveTab('filters')}
+          >
+            🔍 {t('tabs.filters')}
+          </button>
+          <button
+            className={activeTab === 'plots' ? 'active' : ''}
+            onClick={() => setActiveTab('plots')}
+          >
+            📈 {t('tabs.plots')}
+          </button>
+        </nav>
+
+        {/* 标签页内容 */}
+        <div className="enhanced-tab-content">
+          {activeTab === 'layers' && (
+            <LayerConfigPanel
+              dataset={filteredDataset}
+              onLayerChange={setLayers}
+            />
+          )}
+          {activeTab === 'filters' && (
+            <FeatureFilterPanel
+              dataset={dataset}
+              onFilterChange={setFilter}
+            />
+          )}
+          {activeTab === 'plots' && (
+            <PlotTrackManager
+              dataset={dataset}
+              onTracksChange={setPlotTracks}
+            />
+          )}
+        </div>
+
+        {/* 统计信息 */}
+        {filteredDataset && (
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-value">{visualizedDataset.features.length}</div>
+              <div className="stat-label">
+                {t('stats.showing')} {t('stats.features')}
+              </div>
+            </div>
+            {filter && (
+              <div className="stat-card">
+                <div className="stat-value">
+                  {dataset.features.length - filteredDataset.features.length}
+                </div>
+                <div className="stat-label">
+                  {t('stats.filtered')}
+                </div>
+              </div>
+            )}
+            <div className="stat-card">
+              <div className="stat-value">
+                {dataset.totalLength.toLocaleString()}
+              </div>
+              <div className="stat-label">{t('stats.totalLength')}</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <ResizablePanel
+      leftPanel={leftPanelContent}
+      rightPanel={rightPanelContent}
+      defaultLeftWidth={0.7}
+      minLeftWidth={0.3}
+      maxLeftWidth={0.9}
+      className="workspace-enhanced-layout"
+    />
   );
 };
