@@ -44,7 +44,9 @@ export const LayerConfigPanel = ({
 
   // Initialize layers when dataset changes
   useMemo(() => {
-    if (featureTypes.length > 0 && layers.length === 0) {
+  useMemo(() => {
+    console.log('[LayerConfigPanel] Initializing layers for featureTypes:', featureTypes);
+    if (featureTypes.length > 0) {
       const initialLayers: LayerVisibility[] = featureTypes.map((ft, index) => ({
         type: ft.type,
         visible: true,
@@ -53,11 +55,15 @@ export const LayerConfigPanel = ({
         labelField: 'name',
         opacity: 0.8
       }));
+      console.log('[LayerConfigPanel] Setting initial layers:', initialLayers);
       setLayers(initialLayers);
       onLayerChange(initialLayers);
+    } else {
+      console.log('[LayerConfigPanel] No feature types found, clearing layers');
+      setLayers([]);
     }
-  }, [featureTypes.length]);
-
+  }, [dataset?.id, featureTypes.length]); // 依赖数据集ID和特征类型数量
+  }, [dataset?.id, featureTypes.length]);
   const handleVisibilityToggle = (type: string) => {
     const updated = layers.map((layer) =>
       layer.type === type ? { ...layer, visible: !layer.visible } : layer
