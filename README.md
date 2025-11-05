@@ -373,14 +373,6 @@ copies or substantial portions of the Software.
 
 ---
 
-## 📞 联系我们
-
-- **项目主页**: https://github.com/your-org/cgview-desktop
-- **问题反馈**: https://github.com/your-org/cgview-desktop/issues
-- **讨论区**: https://github.com/your-org/cgview-desktop/discussions
-- **邮件**: cgview-desktop@example.com
-
----
 
 <div align="center">
 
