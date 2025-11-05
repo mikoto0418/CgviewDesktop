@@ -77,13 +77,27 @@ export const FeatureFilterPanel = ({
     (key) => filter[key as keyof FilterCriteria] !== undefined
   );
 
+  // 如果没有数据集，显示提示
+  if (!dataset) {
+    return (
+      <div className="feature-filter-panel">
+        <div className="panel-header">
+          <h3>🔍 特征筛选</h3>
+        </div>
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(148, 163, 184, 0.8)' }}>
+          <p>请先导入数据集以进行筛选</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="feature-filter-panel">
       <div className="panel-header">
-        <h3>{t('filters.title')}</h3>
+        <h3>🔍 特征筛选</h3>
         {hasActiveFilter && (
           <button onClick={handleClearFilter} className="btn-secondary">
-            {t('filters.clear')}
+            清除筛选
           </button>
         )}
       </div>

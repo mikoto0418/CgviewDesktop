@@ -102,6 +102,36 @@ export const LayerConfigPanel = ({
     onLayerChange(updated);
   };
 
+  // 如果没有数据集，显示提示
+  if (!dataset) {
+    return (
+      <div className="panel">
+        <div className="panel-header">
+          <span className="panel-icon">🎨</span>
+          <h3 className="panel-title">{t('layers.title')}</h3>
+        </div>
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(148, 163, 184, 0.8)' }}>
+          <p>请先导入数据集以配置图层</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果没有特征类型，显示提示
+  if (featureTypes.length === 0) {
+    return (
+      <div className="panel">
+        <div className="panel-header">
+          <span className="panel-icon">🎨</span>
+          <h3 className="panel-title">{t('layers.title')}</h3>
+        </div>
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(148, 163, 184, 0.8)' }}>
+          <p>数据集中没有找到特征数据</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="panel">
       <div className="panel-header">
