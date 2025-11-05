@@ -1,0 +1,30 @@
+{
+  "list": {
+    "title": "Projects",
+    "empty": "No projects yet. Create one to get started!",
+    "createdAt": "Created {{date}}"
+  },
+  "form": {
+    "title": "Create Project",
+    "nameLabel": "Project Name",
+    "namePlaceholder": "e.g. E. coli K12 Analysis",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Add notes or team info",
+    "submit": "Create Project",
+    "submitting": "Creating..."
+  },
+  "detail": {
+    "title": "Project Details",
+    "empty": "Select a project to view details.",
+    "label": "Active",
+    "noDescription": "No description provided.",
+    "createdAt": "Created at",
+    "updatedAt": "Last updated",
+    "openAction": "Open project (coming soon)"
+  },
+  "alerts": {
+    "loadFailed": "Failed to load projects.",
+    "createFailed": "Failed to create project.",
+    "openFailed": "Failed to open project."
+  }
+}

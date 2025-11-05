@@ -1,0 +1,14 @@
+{
+  "title": "Project Overview",
+  "subtitle": "Import annotation data and prepare circular genome rendering.",
+  "runtime": {
+    "version": "Electron Version",
+    "platform": "Platform"
+  },
+  "nextSteps": {
+    "title": "Next steps",
+    "importData": "Import GenBank / GFF / JSON annotation files.",
+    "configureLayers": "Configure feature layers, colors, and filters.",
+    "prepareRendering": "Preview the rendering and prepare export."
+  }
+}

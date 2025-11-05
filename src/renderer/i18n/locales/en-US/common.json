@@ -1,0 +1,18 @@
+{
+  "app": {
+    "name": "CGView Desktop",
+    "loading": "Loading..."
+  },
+  "language": {
+    "zhCN": "Chinese",
+    "enUS": "English"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "loading": "Loading..."
+  }
+}

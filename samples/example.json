@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "recordCount": 4,
+    "totalLength": 12000,
+    "organism": "Escherichia coli K-12 (mock)"
+  },
+  "sequence": {
+    "length": 12000
+  },
+  "features": [
+    {
+      "name": "oriC",
+      "type": "origin_of_replication",
+      "start": 150,
+      "stop": 450,
+      "strand": 1,
+      "color": "#22c55e",
+      "qualifiers": {
+        "note": "Replication origin"
+      }
+    },
+    {
+      "name": "geneA",
+      "type": "gene",
+      "start": 900,
+      "stop": 1650,
+      "strand": 1,
+      "color": "#38bdf8",
+      "qualifiers": {
+        "product": "Hypothetical protein A"
+      }
+    },
+    {
+      "name": "geneB",
+      "type": "gene",
+      "start": 2200,
+      "stop": 3200,
+      "strand": -1,
+      "color": "#f97316",
+      "qualifiers": {
+        "product": "Transporter protein B"
+      }
+    },
+    {
+      "name": "tRNA-Lys",
+      "type": "tRNA",
+      "start": 4800,
+      "stop": 5050,
+      "strand": 1,
+      "color": "#a855f7",
+      "qualifiers": {
+        "anticodon": "AAA"
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+# Node & build outputs
+node_modules/
+dist/
+release/
+.env
+data/
+
+# Logs & temp
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+/generated/prisma

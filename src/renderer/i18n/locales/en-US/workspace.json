@@ -1,0 +1,205 @@
+{
+  "empty": "No project selected. Return to the dashboard.",
+  "actions": {
+    "back": "Back to Dashboard"
+  },
+  "viewMode": {
+    "traditional": "Traditional View",
+    "enhanced": "Enhanced View (Beta)",
+    "traditionalDescription": "Traditional view with full features",
+    "enhancedDescription": "Enhanced view with tabbed interface"
+  },
+  "enhanced": {
+    "notice": "Enhanced view is in beta. For full features including data import, use Traditional View.",
+    "selectDataset": "Select Dataset",
+    "chooseDataset": "Choose a dataset...",
+    "selectDatasetPrompt": "Please select a dataset to view"
+  },
+  "noDescription": "No description provided.",
+  "meta": {
+    "createdAt": "Created at {{value}}",
+    "updatedAt": "Last updated {{value}}"
+  },
+  "panels": {
+    "rendering": "Rendering Workspace",
+    "renderingHint": "The CGView canvas and configuration panels will appear here."
+  },
+  "tabs": {
+    "layers": "Layers",
+    "filters": "Filters",
+    "plots": "Plots"
+  },
+  "layers": {
+    "title": "Layer Configuration",
+    "showAll": "Show All",
+    "hideAll": "Hide All",
+    "color": "Color",
+    "opacity": "Opacity",
+    "showLabels": "Show Labels",
+    "noData": "No feature data available"
+  },
+  "configManager": {
+    "save": "Save Config",
+    "load": "Load Config",
+    "reset": "Reset",
+    "saveTooltip": "Save current layer configuration",
+    "loadTooltip": "Load from saved configurations",
+    "resetTooltip": "Reset to default configuration",
+    "saveDialog": {
+      "title": "Save Layer Configuration",
+      "name": "Configuration Name",
+      "namePlaceholder": "Enter configuration name",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Add a description..."
+    },
+    "loadDialog": {
+      "title": "Load Layer Configuration"
+    },
+    "apply": "Apply",
+    "export": "Export Config",
+    "import": "Import Config",
+    "importSuccess": "Configuration imported successfully",
+    "setDefault": "Set as Default",
+    "default": "Default",
+    "updated": "Updated",
+    "confirmDelete": "Are you sure you want to delete this configuration? This action cannot be undone.",
+    "noConfigs": "No saved configurations"
+  },
+  "filters": {
+    "title": "Feature Filter",
+    "clear": "Clear Filter",
+    "name": "Name",
+    "namePlaceholder": "Enter name keyword",
+    "type": "Type",
+    "allTypes": "All Types",
+    "contains": "Contains Text",
+    "containsPlaceholder": "Search in any field",
+    "minPosition": "Min Position",
+    "maxPosition": "Max Position",
+    "strand": "Strand",
+    "allStrands": "All Strands",
+    "forward": "Forward",
+    "reverse": "Reverse",
+    "activeFilters": "Active Filters"
+  },
+  "plots": {
+    "title": "Plot Tracks",
+    "addGCContent": "Add GC Content",
+    "addGCSkew": "Add GC Skew",
+    "addCoverage": "Add Coverage",
+    "addATContent": "Add AT Content",
+    "addBaseComposition": "Add Base Composition",
+    "addFeatureDensity": "Add Feature Density",
+    "addSequenceComplexity": "Add Sequence Complexity",
+    "name": "Track Name",
+    "color": "Color",
+    "windowSize": "Window Size",
+    "baseline": "Baseline",
+    "gcContent": "GC Content",
+    "gcSkew": "GC Skew",
+    "coverage": "Coverage",
+    "atContent": "AT Content",
+    "baseComposition": "Base Composition",
+    "featureDensity": "Feature Density",
+    "sequenceComplexity": "Sequence Complexity",
+    "custom": "Custom",
+    "emptyState": "Click buttons above to add plot tracks",
+    "noData": "Please import data first to add tracks"
+  },
+  "stats": {
+    "showing": "Showing",
+    "features": "features",
+    "filtered": "filtered",
+    "totalLength": "sequence length"
+  },
+  "datasets": {
+    "title": "Imported Datasets",
+    "empty": "No datasets imported yet.",
+    "refresh": "Refresh",
+    "recordCount": "{{count}} records",
+    "importedAt": "Imported {{value}}",
+    "loadFailed": "Failed to load datasets.",
+    "detailTitle": "Dataset Detail",
+    "detailEmpty": "Select a dataset to view details.",
+    "detailLoading": "Loading dataset detail...",
+    "featurePreview": "Feature preview (first {{count}} of {{total}} entries)",
+    "sequenceLength": "Sequence length {{length}} bp",
+    "featureTotal": "{{count}} features in total",
+    "filterPlaceholder": "Search features...",
+    "clearFilter": "Clear",
+    "filterMatches": "{{matched}} matched",
+    "filterEmpty": "No features matched the current filter.",
+    "displayNameLabel": "Display Name",
+    "displayNamePlaceholder": "e.g. Sample A circular map",
+    "renameSave": "Save Name",
+    "renaming": "Saving...",
+    "renameReset": "Reset",
+    "renameFailed": "Failed to update the display name. Please try again.",
+    "delete": "Delete Dataset",
+    "deleting": "Deleting...",
+    "deleteConfirm": "Are you sure you want to delete this dataset? This action cannot be undone.",
+    "deleteFailed": "Failed to delete the dataset. Please try again."
+  },
+  "featureControls": {
+    "title": "Feature layers",
+    "hiddenCount": "{{count}} hidden",
+    "reset": "Reset layers",
+    "count": "{{count}} items",
+    "colorLabel": "{{type}} color",
+    "unknownType": "Unclassified",
+    "saving": "Saving…",
+    "saveFailed": "Failed to save the layer state. Please try again."
+  },
+  "plotControls": {
+    "title": "Plot tracks",
+    "save": "Save plots",
+    "saving": "Saving plots...",
+    "reset": "Reset visibility",
+    "empty": "No plot tracks available for this dataset.",
+    "fallbackName": "Plot {{index}}",
+    "kinds": {
+      "gcContent": "GC content",
+      "gcSkew": "GC skew",
+      "coverage": "Coverage",
+      "custom": "Custom"
+    },
+    "saveFailed": "Failed to save plot tracks. Please try again."
+  },
+  "linkControls": {
+    "title": "Link tracks",
+    "save": "Save links",
+    "saving": "Saving links...",
+    "reset": "Reset visibility",
+    "empty": "No link tracks available for this dataset.",
+    "fallbackName": "Link {{index}}",
+    "connectionCount": "{{count}} connections",
+    "kinds": {
+      "alignment": "Alignment",
+      "synteny": "Synteny",
+      "custom": "Custom"
+    },
+    "saveFailed": "Failed to save link tracks. Please try again."
+  },
+  "viewer": {
+    "empty": "Select a dataset with features to preview the circular map.",
+    "exportPNG": "Export PNG",
+    "exportSVG": "Export SVG",
+    "truncated": "Showing the first {{count}} features to keep rendering responsive. Export to view the full set.",
+    "legendToggle": "Show legend",
+    "unknown": "Unknown",
+    "performance": {
+      "optimizedMode": "Optimized",
+      "highPerformanceMode": "High Performance",
+      "memoryUsage": "{{value}}MB",
+      "features": "{{shown}}/{{total}} features"
+    },
+    "stats": {
+      "total": "Total features",
+      "filtered": "Filtered",
+      "length": "Sequence length",
+      "lengthValue": "{{value}} bp",
+      "truncated": "Hidden by limit",
+      "truncatedValue": "{{count}} hidden"
+    }
+  }
+}

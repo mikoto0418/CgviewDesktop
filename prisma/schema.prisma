@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id                      String         @id @default(cuid())
+  name                    String
+  description             String?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+  datasets                Dataset[]
+  featureLayers           FeatureLayer[]
+  renderConfigs           RenderConfig[]
+  filters                 Filter[]
+  jobs                    Job[]
+  preferences             Preference[]
+  defaultRenderConfig     RenderConfig?  @relation("DefaultRenderConfig", fields: [defaultRenderConfigId], references: [id])
+  defaultRenderConfigId   String?        @unique
+}
+
+model Dataset {
+  id            String   @id @default(cuid())
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId     String
+  fileName      String
+  fileType      String
+  status        String
+  metadataJson  Json?
+  importedAt    DateTime @default(now())
+}
+
+model FeatureLayer {
+  id           String   @id @default(cuid())
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String
+  name         String
+  order        Int
+  configJson   Json
+  createdAt    DateTime @default(now())
+}
+
+model RenderConfig {
+  id           String   @id @default(cuid())
+  project      Project? @relation(fields: [projectId], references: [id])
+  projectId    String?
+  name         String
+  payloadJson  Json
+  isTemplate   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  defaultForProject Project? @relation("DefaultRenderConfig")
+}
+
+model Filter {
+  id              String   @id @default(cuid())
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId       String
+  name            String
+  definitionJson  Json
+  isShared        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  project     Project?  @relation(fields: [projectId], references: [id])
+  projectId   String?
+  type        String
+  payloadJson Json
+  status      String
+  progress    Int       @default(0)
+  logPath     String?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Preference {
+  id        String   @id @default(cuid())
+  scope     String
+  key       String
+  value     Json
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+  updatedAt DateTime @updatedAt
+
+  @@unique([scope, key, projectId])
+}

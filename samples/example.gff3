@@ -1,0 +1,11 @@
+##gff-version 3
+##sequence-region chr1 1 12000
+chr1	.	source	1	12000	.	+	.	ID=source1;Name=SampleGenome
+chr1	.	rep_origin	150	450	.	+	.	ID=oriC;Name=oriC;Note=Replication_origin
+chr1	.	gene	900	1650	.	+	.	ID=geneA;Name=geneA
+chr1	.	CDS	920	1600	.	+	0	ID=cdsA;Parent=geneA;Name=geneA_CDS;Product=Hypothetical_protein_A
+chr1	.	gene	2200	3200	.	-	.	ID=geneB;Name=geneB
+chr1	.	CDS	2220	3180	.	-	0	ID=cdsB;Parent=geneB;Name=geneB_CDS;Product=Transporter_B
+chr1	.	tRNA	4800	5050	.	+	.	ID=tRNA-Lys;Name=tRNA-Lys;Note=Anticodon_AAA
+chr1	.	gene	5600	6100	.	+	.	ID=geneC;Name=geneC
+chr1	.	CDS	5625	6050	.	+	0	ID=cdsC;Parent=geneC;Name=geneC_CDS;Product=Regulator_C

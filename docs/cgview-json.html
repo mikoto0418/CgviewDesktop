@@ -1,0 +1,397 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Icon -->
+    <link rel="shortcut icon" type="image/png" href="images/logo-tab.png">
+
+    <!-- CG Apps Logo -->
+    <script src='scripts/logo.js'></script>
+    <link href="styles/logo.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles/prism.css" />
+    <!-- <link rel="stylesheet" href="styles/tables.css" /> -->
+    <link rel="stylesheet" href="styles/general.css" />
+    <script src='scripts/marked.min.js'></script>
+    <script src='scripts/general.js'></script>
+
+    <!-- Plausible Analytics -->
+    <script defer data-domain="js.cgview.ca" src="https://stats.stothardresearch.ca/js/plausible.outbound-links.js"></script>
+
+    <title>CGView.js - JSON</title>
+  </head>
+  <body>
+    <!-- Nav Bar -->
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- CG Apps Logo -->
+        <div id="logo-container">
+          <div class="logo-wrap">
+            <a href="/" id="app-logo" aria-haspopup="true" aria-expanded="false">
+              <img src="images/cgview-logo.png" alt="CG Apps" />
+            </a>
+            <div id="cg-apps" role="menu" aria-label="CG Apps">
+              <a role="menuitem" href="https://js.cgview.ca"><img src='images/cgview-logo.png' />CGView.js</a>
+              <a role="menuitem" href="https://parse.cgview.ca"><img src='images/cgparse-logo.png' />CGParse.js</a>
+            </div>
+          </div>
+          <a class="navbar-brand" href="index.html">CGView.js</a>
+        </div>
+
+        <!-- Docs Toggle -->
+        <button class="btn sidebar-toggle d-sm-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-nav" aria-controls="cgv-docs-nav" aria-expanded="false" aria-label="Toggle docs navigation">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="bi bi-expand" fill="currentColor" viewBox="0 0 16 16"> <title>Expand</title> <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8zM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10z"></path> </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="bi bi-collapse" fill="currentColor" viewBox="0 0 16 16"> <title>Collapse</title> <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0zm-.5 11.707l-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793z"></path> </svg>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <div class="navbar-nav">
+            <a class="nav-link" href="examples/index.html">Examples</a>
+            <a class="nav-link" href="tutorials/index.html">Tutorials</a>
+            <a class="nav-link" href="docs.html">Docs</a>
+            <a class="nav-link" href="api/index.html">API</a>
+            <a class="nav-link active" href="json.html">JSON</a>
+            <a class="nav-link" href="test/index.html">Test</a>
+            <a class="nav-link github-logo" href="https://github.com/sciguy/cgview-js"><img src='images/GitHub-Mark-Light-64px.png' /></a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Side Nav -->
+    <nav id='sidebar-nav'>
+      <ul id='gumshoe-list' class='sidebar-list'>
+          <!-- THIS NAV CONTENT IS REPLACED WITH JSON LINKS BY SCRIPT BELOW -->
+      </ul>
+    </nav>
+
+    <main>
+      <!-- Processed Markdown will be inserted here -->
+      <div id='markdown-out'></div>
+    </main>
+
+    <div id='markdown-in' style='display:none;'>
+
+<!-- The feature lines link in header needs to be manually updated if the JSON changes -->
+# CGView JSON
+
+Data can be loaded from a JavaScript object literal or a JSON string using [IO.loadJSON](api/IO.html#loadJSON).
+The two formats are very similar and can be converted using JSON.parse and JSON.stringify.
+The example below is shown as an object literal and only shows some of the possible options for each key.
+Click on a key (e.g. backbone, captions, etc) for options and defaults.
+
+The following two options are available for most sections of the JSON but are
+only present when they have non-default values (see the first [feature](#lines.98-111) for an example with non-default values):
+- _visible_ [Default: true]
+- _meta_ [Default: {}].  The _meta_ key is a place to store [user/app-defined meta data](tutorials/details-meta-data.html).
+
+```json
+{
+    "cgview": {
+        "version": "1.7.0",
+        "created": "2022-08-08 13:29:07",
+        "updated": "2022-08-08 13:29:07",
+        "name": "My Cool Map",
+        "id": "f078a696a89c4c97d526f588933ddcbafd6ba037",
+        "settings": {
+            "format": "circular",
+            "geneticCode": "11",
+            "backgroundColor": "rgba(255,255,255,1)",
+            "showShading": true,
+            "arrowHeadLength": 0.3,
+            "initialMapThicknessProportion": 0,
+            "maxMapThicknessProportion": 0
+        },
+        "backbone": {
+            "color": "rgba(128,128,128,1)",
+            "thickness": 5,
+            "decoration": 'arrow'
+        },
+        "ruler": {
+            "font": "sans-serif,plain,10",
+            "color": "rgba(0,0,0,1)"
+        },
+        "annotation": {
+            "font": "sans-serif,plain,12"
+        },
+        "dividers": {
+            "track": {
+                "color": "rgba(50,50,50,1)",
+                "thickness": 1,
+                "spacing": 1
+            },
+            "slot": {
+                "color": "rgba(128,128,128,1)",
+                "thickness": 1,
+                "spacing": 1
+            }
+        },
+        "captions": [
+            {
+                "name": "Escherichia coli B171 plasmid pB171_90",
+                "position": "bottom-center",
+                "textAlignment": "left",
+                "font": "sans-serif,plain,24",
+                "fontColor": "rgba(255,165,0,1)",
+                "backgroundColor": "rgba(255,255,255,0.4)"
+            }
+        ],
+        "legend": {
+            "position": "top-right",
+            "textAlignment": "left",
+            "defaultFont": "sans-serif,plain,14",
+            "defaultFontColor": "rgba(0,0,0,1)",
+            "defaultMinArcLength": 0,
+            "backgroundColor": "rgba(255,255,255,0.75)",
+            "items": [
+                {
+                    "name": "CDS",
+                    "decoration": "arrow"
+                    "swatchColor": "rgba(0,0,153,0.5)",
+                },
+                {
+                    "name": "rRNA",
+                    "decoration": "arrow"
+                    "swatchColor": "rgba(0,153,53,0.5)",
+                    "font": "sans-serif,plain,16",
+                    "fontColor": "rgba(100,0,0,1)",
+                    "textAlignment": "left",
+                }
+            ]
+        },
+        "sequence": {
+            "color": "rgb(0,0,0)",
+            "font": "sans-serif,plain,14",
+            "contigs": [
+                {
+                    "name": "CP021212",
+                    "length": 90229,
+                    "orientation": "+",
+                    "seq": "ATGCCAACTTCATTATCTGTGCCCAGAGACAGCGCATTCAGCAGT..."
+                }
+            ]
+        },
+        "bookmarks": [
+            {
+                "bbOffset": 86.75,
+                "bp": 5617,
+                "favorite": false,
+                "format": "circular",
+                "name": "Bookmark-1",
+                "shortcut": "1",
+                "zoom": 1.685
+            }
+        ],
+        "features": [
+            {
+                "name": "rnl",
+                "type": "rRNA",
+                "contig": "CP021212",
+                "start": 56,
+                "stop": 2806,
+                "strand": 1,
+                "source": "sequence-features",
+                "legend": "rRNA"
+                "visible": false,
+                "meta": {
+                  "score": 1234
+                }
+            },
+            {
+                "name": "nad8",
+                "type": "CDS",
+                "contig": "CP021212",
+                "start": 3252,
+                "stop": 3740,
+                "strand": -1,
+                "source": "sequence-features",
+                "legend": "CDS"
+            }
+        ],
+        "plots": [
+        ],
+        "tracks": [
+            {
+                "name": "Features",
+                "separateFeaturesBy": "strand",
+                "position": "both",
+                "thicknessRatio": 1,
+                "dataType": "feature",
+                "dataMethod": "source",
+                "dataKeys": "sequence-features"
+            }
+        ]
+    }
+}
+```
+
+<br /><br />
+
+    </div> <!-- End of markdown in -->
+
+    <!-- <script> -->
+    <!--   tutorialMarkdown(marked); -->
+    <!-- </script> -->
+
+    <script src="scripts/prism.js"></script>
+    <script>
+      const convertPropertiesToLinks = (content) => {
+        switch(content) {
+          case '"cgview"':      return `<a class="json-link" href="api/Viewer.html">${content}</a>`;
+          case '"settings"':    return `<a class="json-link" href="api/Settings.html">${content}</a>`;
+          case '"backbone"':    return `<a class="json-link" href="api/Backbone.html">${content}</a>`;
+          case '"bookmarks"':   return `<a class="json-link" href="api/Bookmark.html">${content}</a>`;
+          case '"ruler"':       return `<a class="json-link" href="api/Ruler.html">${content}</a>`;
+          case '"annotation"':  return `<a class="json-link" href="api/Annotation.html">${content}</a>`;
+          case '"dividers"':    return `<a class="json-link" href="api/Dividers.html">${content}</a>`;
+          case '"captions"':    return `<a class="json-link" href="api/Caption.html">${content}</a>`;
+          case '"legend"':      return `<a class="json-link" href="api/Legend.html">${content}</a>`;
+          case '"items"':       return `<a class="json-link" href="api/LegendItem.html">${content}</a>`;
+          case '"sequence"':    return `<a class="json-link" href="api/Sequence.html">sequence"</a>`;
+          case '"contigs"':     return `<a class="json-link" href="api/Contig.html">${content}</a>`;
+          case '"features"':    return `<a class="json-link" href="api/Feature.html">${content}</a>`;
+          case '"plots"':       return `<a class="json-link" href="api/Plot.html">${content}</a>`;
+          case '"tracks"':      return `<a class="json-link" href="api/Track.html">${content}</a>`;
+
+          case '"color"':
+          case '"fontColor"':
+          case '"backgroundColor"':
+          case '"defaultFontColor"':
+          case '"swatchColor"': return `<a class="json-link" href="api/Color.html">${content}</a>`;
+
+          case '"font"':
+          case '"defaultFont"':        return `<a class="json-link" href="api/Font.html">${content}</a>`;
+
+          case '"track"':       return `<a class="json-link" href="api/Divider.html">${content}</a>`;
+          case '"slot"':        return `<a class="json-link" href="api/Divider.html">${content}</a>`;
+          case '"position"':    return `<a class="json-link" href="api/Position.html">${content}</a>`;
+        }
+      }
+      // The following links were helpful:
+      // https://prismjs.com/extending.html#writing-plugins
+      // https://gordonlesti.com/prism-hooks-list/
+      Prism.hooks.add('wrap', function(env) {
+        if (env.type === 'property') {
+          const link = convertPropertiesToLinks(env.content);
+          if (link) {
+            env.content = link;
+          }
+        }
+      });
+    </script>
+
+    <script>
+      // Convert Markdown to HTML
+      var marked_ = marked;
+      var marked = function(text) {
+        var tok = marked_.lexer(text);
+        text = marked_.parser(tok);
+        text = text.replace(/<pre>/ig, '<pre class="line-numbers" id="lines">');
+        return text;
+      };
+      var inEl = document.querySelector('#markdown-in');
+      var outEl = document.querySelector('#markdown-out');
+      outEl.innerHTML = marked( inEl.innerHTML );
+    </script>
+
+    <script>
+      // Get line number for each sidebar nav link property
+      const properties = ['settings', 'backbone', 'ruler', 'annotation', 'dividers',
+				'captions', 'legend', 'sequence', 'bookmarks', 'features', 'plots', 'tracks',
+      ];
+      const json = outEl.innerHTML.replace(/[\s\S]*"cgview"/, '"cgview"')
+      const lines = json.split(/\r?\n/);
+      const pLines = {};
+      const offset = 2;
+      properties.forEach( (property) => {
+        pLines[property] = {};
+        const re = new RegExp('(\\s*)"' + property + '": [\\{\\[]')
+        lines.forEach( (line, linenum) => {
+          if (!pLines[property].start) {
+            const match = line.match(re);
+            if (match) {
+              pLines[property].start = linenum + offset;
+              pLines[property].padding = match[1].length;
+              pLines[property].paddingRegex = new RegExp('^\\s{' + match[1].length + '}[\\}\\]]');
+            }
+          } else if (!pLines[property].stop) {
+            const paddingMatch = line.match(pLines[property].paddingRegex);
+            if (paddingMatch) {
+              pLines[property].stop = linenum + offset;
+            }
+          }
+        });
+      });
+      // console.log(pLines);
+      // Add line numbers to sidebar anchor links
+      const sideNav = document.querySelector('#gumshoe-list');
+      let links = '<li><a class="side-link" href="#lines.2">cgview</a></li>'
+      properties.forEach( (property) => {
+       const pLine = pLines[property];
+        if (pLines[property]) {
+          links += `<li><a class="side-link indent" href="#lines.${pLine.start}-${pLine.stop}">${property}</a></li>`
+        }
+      });
+      sideNav.innerHTML = links;
+    </script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="scripts/bootstrap.min.js"></script>
+
+    <script>
+      var sidebar = document.getElementById('sidebar-nav');
+
+      function getOffset(el) {
+        const rect = el.getBoundingClientRect();
+        return {
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY
+        };
+      }
+
+      // Make sidebar link active if present.
+      // Also scroll window to better center the highlighted code
+      const makeLinkActive = () => {
+        if (window.location.hash) {
+          // Activate the appropriate link
+          var hash = window.location.hash.substring(1);
+          var linkEl = document.querySelectorAll(`a[href='#${hash}']`)[0];
+          if (linkEl) {
+            const allItems = document.querySelectorAll('#sidebar-nav li');
+            allItems.forEach( (el) =>{
+              el.classList.remove("active");
+            });
+            var listEl = linkEl.parentNode;
+            listEl.classList.add('active');
+          }
+
+          // Scroll back to center the highlighted region
+          const line = hash.replace('lines.', '').replace(/-.*$/, '');
+          const lineHeight = 18; // TODO: get from js
+          const jsonPreBlock = document.querySelector('#lines');
+          const jsonOffset = getOffset(jsonPreBlock);
+          const scrollCorrection = window.innerHeight / 3;
+          const codeOffset = jsonOffset.top + (line * lineHeight) - scrollCorrection;
+          window.scrollTo(0, codeOffset);
+        }
+      }
+
+      window.onload = makeLinkActive;
+      window.addEventListener('popstate', function (event) {
+        setTimeout(makeLinkActive, 100)
+      });
+
+    </script>
+
+  </body>
+</html>
+

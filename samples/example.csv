@@ -1,0 +1,5 @@
+name,type,start,stop,strand,color,note
+oriC,origin,150,450,1,#22c55e,Replication origin
+geneA,gene,900,1650,1,#38bdf8,Encodes hypothetical protein A
+geneB,gene,2200,3200,-1,#f97316,Predicted transporter
+tRNA-Lys,tRNA,4800,5050,1,#a855f7,Anticodon AAA

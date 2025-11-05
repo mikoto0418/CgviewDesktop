@@ -1,0 +1,30 @@
+{
+  "list": {
+    "title": "项目列表",
+    "empty": "还没有任何项目，创建一个新项目开始吧！",
+    "createdAt": "创建于 {{date}}"
+  },
+  "form": {
+    "title": "新建项目",
+    "nameLabel": "项目名称",
+    "namePlaceholder": "例如：大肠杆菌 K12 分析",
+    "descriptionLabel": "项目描述（可选）",
+    "descriptionPlaceholder": "补充说明或团队信息",
+    "submit": "创建项目",
+    "submitting": "创建中..."
+  },
+  "detail": {
+    "title": "项目详情",
+    "empty": "请选择一个项目以查看详情。",
+    "label": "当前项目",
+    "noDescription": "暂无描述信息。",
+    "createdAt": "创建时间",
+    "updatedAt": "最近更新",
+    "openAction": "打开项目"
+  },
+  "alerts": {
+    "loadFailed": "项目列表加载失败",
+    "createFailed": "项目创建失败",
+    "openFailed": "项目打开失败"
+  }
+}

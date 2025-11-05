@@ -1,0 +1,36 @@
+{
+  "title": "Data Import Wizard",
+  "subtitle": "Select a parser and provide the file path to process.",
+  "fields": {
+    "format": "Parser Format",
+    "filePath": "File Path"
+  },
+  "placeholder": {
+    "format": "No parser selected",
+    "filePath": "e.g. C:/data/mock.gb",
+    "result": "No dataset parsed yet. Result preview will appear here.",
+    "fileSelected": "Selected: {{path}}"
+  },
+  "helper": {
+    "mockFile": "Supports GenBank / GFF3 / JSON / CSV files. Use \"Browse\" to pick a local path.",
+    "csvColumns": "CSV files must include start and stop columns. Supplying name, type, strand, and color helps with richer maps."
+  },
+  "actions": {
+    "start": "Run Parser",
+    "parsing": "Parsing...",
+    "browse": "Browse"
+  },
+  "result": {
+    "title": "Parsed Dataset",
+    "summary": "Parsed {{recordCount}} records 路 Source {{organism}}",
+    "unknownOrganism": "Unknown organism"
+  },
+  "alerts": {
+    "loadFailed": "Failed to load parsers.",
+    "parseFailed": "Failed to parse dataset."
+  },
+  "warningsTitle": "Warnings",
+  "filters": {
+    "any": "All files"
+  }
+}

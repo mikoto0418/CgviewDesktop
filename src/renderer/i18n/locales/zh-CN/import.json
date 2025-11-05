@@ -1,0 +1,36 @@
+{
+  "title": "数据导入向导",
+  "subtitle": "选择解析器并输入待处理文件路径。",
+  "fields": {
+    "format": "解析格式",
+    "filePath": "文件路径"
+  },
+  "placeholder": {
+    "format": "未选择解析器",
+    "filePath": "例如：C:/data/mock.gb",
+    "result": "尚未解析，提交后将在此显示结果。",
+    "fileSelected": "已选择：{{path}}"
+  },
+  "helper": {
+    "mockFile": "支持 GenBank / GFF3 / JSON / CSV 文件，点击“浏览”选择本地路径。",
+    "csvColumns": "CSV 文件至少需要包含 start、stop 两列，建议额外提供 name、type、strand、color 等列。"
+  },
+  "actions": {
+    "start": "开始解析",
+    "parsing": "解析中...",
+    "browse": "浏览文件"
+  },
+  "result": {
+    "title": "解析结果",
+    "summary": "共解析 {{recordCount}} 条记录 · 来源 {{organism}}",
+    "unknownOrganism": "未知物种"
+  },
+  "alerts": {
+    "loadFailed": "解析器列表加载失败",
+    "parseFailed": "数据解析失败"
+  },
+  "warningsTitle": "警告",
+  "filters": {
+    "any": "所有文件"
+  }
+}
