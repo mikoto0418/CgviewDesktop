@@ -5,6 +5,7 @@ import type {
 
 const ensureBridge = () => {
   if (!window.appBridge) {
+    console.warn('[Renderer] App bridge is not available. Running in browser mode?');
     throw new Error('App bridge is not available. Are you running inside Electron?');
   }
 
@@ -14,6 +15,10 @@ const ensureBridge = () => {
 export const ProjectService = {
   async list(): Promise<ProjectSummary[]> {
     try {
+      if (!window.appBridge?.listProjects) {
+        console.warn('[ProjectService] Running in browser mode, returning empty project list');
+        return [];
+      }
       const bridge = ensureBridge();
       if (!bridge.listProjects) {
         return [];
@@ -26,6 +31,10 @@ export const ProjectService = {
   },
 
   async create(input: CreateProjectInput): Promise<ProjectSummary> {
+    if (!window.appBridge?.createProject) {
+      console.warn('[ProjectService] Running in browser mode, createProject not available');
+      throw new Error('Create project API is not available. Are you running inside Electron?');
+    }
     const bridge = ensureBridge();
     if (!bridge.createProject) {
       throw new Error('Create project API is not available.');
@@ -36,6 +45,9 @@ export const ProjectService = {
   },
 
   async get(projectId: string): Promise<ProjectSummary | null> {
+    if (!window.appBridge?.getProject) {
+      return null;
+    }
     const bridge = ensureBridge();
     if (!bridge.getProject) {
       throw new Error('Get project API is not available.');
@@ -44,6 +56,9 @@ export const ProjectService = {
   },
 
   async getActiveId(): Promise<string | null> {
+    if (!window.appBridge?.getActiveProjectId) {
+      return null;
+    }
     const bridge = ensureBridge();
     if (!bridge.getActiveProjectId) {
       return null;
@@ -52,6 +67,9 @@ export const ProjectService = {
   },
 
   async setActive(projectId: string | null): Promise<void> {
+    if (!window.appBridge?.setActiveProjectId) {
+      return;
+    }
     const bridge = ensureBridge();
     if (!bridge.setActiveProjectId) {
       return;

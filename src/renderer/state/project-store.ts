@@ -63,6 +63,21 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
   createProject: async (input) => {
     set({ isCreating: true });
     try {
+      // 在开发模式下，如果没有appBridge，创建模拟项目
+      if (!window.appBridge?.createProject) {
+        console.warn('[ProjectStore] Running in browser mode, creating mock project');
+        const mockProject: ProjectSummary = {
+          id: `mock-${Date.now()}`,
+          name: input.name,
+          description: input.description,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        const projects = [mockProject, ...get().projects];
+        set({ projects, selectedId: mockProject.id, view: 'dashboard' });
+        return mockProject;
+      }
+
       const project = await ProjectService.create(input);
       const projects = [project, ...get().projects];
       set({ projects, selectedId: project.id, view: 'workspace' });
@@ -78,6 +93,13 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
     });
   },
   openProject: async (projectId) => {
+    // 在开发模式下，如果没有appBridge，直接切换到工作区
+    if (!window.appBridge?.setActiveProjectId) {
+      console.warn('[ProjectStore] Running in browser mode, switching to workspace without backend');
+      set({ selectedId: projectId, view: 'workspace' });
+      return;
+    }
+
     await ProjectService.setActive(projectId);
     set({ selectedId: projectId, view: 'workspace' });
   },
