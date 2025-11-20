@@ -12,6 +12,8 @@ export interface ProjectStoreState {
   view: WorkspaceView;
   loadProjects: () => Promise<void>;
   createProject: (input: CreateProjectInput) => Promise<ProjectSummary>;
+  updateProject: (projectId: string, name: string, description?: string) => Promise<void>;
+  deleteProject: (projectId: string) => Promise<void>;
   selectProject: (projectId: string | null) => void;
   openProject: (projectId: string) => Promise<void>;
   exitWorkspace: () => void;
@@ -84,6 +86,59 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
       return project;
     } finally {
       set({ isCreating: false });
+    }
+  },
+  updateProject: async (projectId, name, description) => {
+    try {
+      if (!window.appBridge?.updateProject) {
+        console.warn('[ProjectStore] Running in browser mode, updateProject not available');
+        return;
+      }
+
+      const updatedProject = await ProjectService.update(projectId, {
+        name,
+        description
+      });
+
+      // 更新本地项目列表
+      const projects = get().projects.map(p => 
+        p.id === projectId ? updatedProject : p
+      );
+      
+      set({ projects });
+    } catch (error) {
+      console.error('[ProjectStore] Failed to update project', error);
+      throw error;
+    }
+  },
+  deleteProject: async (projectId) => {
+    try {
+      if (!window.appBridge?.deleteProject) {
+        console.warn('[ProjectStore] Running in browser mode, deleteProject not available');
+        return;
+      }
+
+      await ProjectService.delete(projectId);
+
+      // 从列表中移除项目
+      const projects = get().projects.filter(p => p.id !== projectId);
+      
+      // 如果删除的是当前选中的项目，选择第一个可用项目
+      let selectedId = get().selectedId;
+      if (selectedId === projectId) {
+        selectedId = projects.length > 0 ? projects[0].id : null;
+        
+        // 如果在工作区视图，返回到仪表板
+        if (get().view === 'workspace') {
+          set({ projects, selectedId, view: 'dashboard' });
+          return;
+        }
+      }
+      
+      set({ projects, selectedId });
+    } catch (error) {
+      console.error('[ProjectStore] Failed to delete project', error);
+      throw error;
     }
   },
   selectProject: (projectId) => {

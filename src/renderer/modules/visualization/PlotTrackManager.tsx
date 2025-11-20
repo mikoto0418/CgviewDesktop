@@ -16,15 +16,16 @@ type PlotTrack = {
 
 type PlotTrackManagerProps = {
   dataset: DatasetDetail | null;
+  tracks: PlotTrack[];
   onTracksChange: (tracks: PlotTrack[]) => void;
 };
 
 export const PlotTrackManager = ({
   dataset,
+  tracks,
   onTracksChange
 }: PlotTrackManagerProps) => {
-  const { t } = useTranslation('workspace');
-  const [tracks, setTracks] = useState<PlotTrack[]>([]);
+  const { t } = useTranslation(['workspace', 'common']);
 
   const handleAddTrack = (type: PlotType) => {
     const newTrack: PlotTrack = {
@@ -37,31 +38,27 @@ export const PlotTrackManager = ({
       baseline: type === 'coverage' ? 0 : undefined
     };
 
-    const updated = [...tracks, newTrack];
-    setTracks(updated);
-    onTracksChange(updated);
+    onTracksChange([...tracks, newTrack]);
   };
 
   const handleRemoveTrack = (id: string) => {
-    const updated = tracks.filter((t) => t.id !== id);
-    setTracks(updated);
-    onTracksChange(updated);
+    onTracksChange(tracks.filter((t) => t.id !== id));
   };
 
   const handleToggleVisibility = (id: string) => {
-    const updated = tracks.map((track) =>
-      track.id === id ? { ...track, visible: !track.visible } : track
+    onTracksChange(
+      tracks.map((track) =>
+        track.id === id ? { ...track, visible: !track.visible } : track
+      )
     );
-    setTracks(updated);
-    onTracksChange(updated);
   };
 
   const handleUpdateTrack = (id: string, updates: Partial<PlotTrack>) => {
-    const updated = tracks.map((track) =>
-      track.id === id ? { ...track, ...updates } : track
+    onTracksChange(
+      tracks.map((track) =>
+        track.id === id ? { ...track, ...updates } : track
+      )
     );
-    setTracks(updated);
-    onTracksChange(updated);
   };
 
   const getDefaultName = (type: PlotType): string => {
@@ -142,7 +139,7 @@ export const PlotTrackManager = ({
                     onClick={() => handleRemoveTrack(track.id)}
                     className="btn-danger btn-sm"
                   >
-                    {t('common.remove')}
+                    {t('common:common.remove')}
                   </button>
                 </div>
 

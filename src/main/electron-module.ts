@@ -37,13 +37,17 @@ try {
 const createMockWindow = () => ({
   webContents: {
     once: () => {},
+    on: () => {},
     getURL: () => 'http://localhost:5173/',
-    openDevTools: () => {}
+    openDevTools: () => {},
+    executeJavaScript: () => Promise.resolve({ hasRoot: false, bodyInnerHTML: '' })
   },
   once: () => {},
   show: () => {},
   loadURL: () => Promise.resolve(),
-  loadFile: () => Promise.resolve()
+  loadFile: () => Promise.resolve(),
+  focus: () => {},
+  setAlwaysOnTop: () => {}
 });
 
 const mockElectron = {
@@ -66,8 +70,13 @@ const mockElectron = {
   }
 };
 
+const hasElectronRuntime = (
+  module: ElectronMainModule | null
+): module is ElectronMainModule =>
+  !!module && typeof module === 'object' && 'app' in module;
+
 // 只有在 electron 成功加载时才使用真实对象
-const electronAPI = (electron && Object.keys(electron).length > 0) ? electron : mockElectron;
+const electronAPI = hasElectronRuntime(electron) ? electron : mockElectron;
 
 export const { app, BrowserWindow, dialog, ipcMain } = electronAPI;
 export type ElectronMain = ElectronMainModule;

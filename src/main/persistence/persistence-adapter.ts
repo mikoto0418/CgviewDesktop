@@ -15,6 +15,8 @@ export interface PersistenceAdapter {
   listProjects(): Promise<ProjectSummary[]>;
   getProjectById(id: string): Promise<ProjectSummary | null>;
   createProject(input: CreateProjectInput): Promise<ProjectSummary>;
+  updateProject(projectId: string, input: Partial<CreateProjectInput>): Promise<ProjectSummary>;
+  deleteProject(projectId: string): Promise<void>;
   getActiveProjectId(): Promise<string | null>;
   setActiveProjectId(projectId: string | null): Promise<void>;
   createDataset(dataset: PersistedDataset): Promise<DatasetSummary>;

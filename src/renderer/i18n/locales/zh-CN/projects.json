@@ -4,6 +4,11 @@
     "empty": "还没有任何项目，创建一个新项目开始吧！",
     "createdAt": "创建于 {{date}}"
   },
+  "actions": {
+    "create": "创建项目",
+    "rename": "重命名",
+    "edit": "编辑"
+  },
   "form": {
     "title": "新建项目",
     "nameLabel": "项目名称",
@@ -20,11 +25,18 @@
     "noDescription": "暂无描述信息。",
     "createdAt": "创建时间",
     "updatedAt": "最近更新",
-    "openAction": "打开项目"
+    "openAction": "打开项目",
+    "renameAction": "重命名项目",
+    "deleteConfirm": "确定要删除项目「{{name}}」吗？所有相关数据将被永久删除。",
+    "renamePlaceholder": "项目名称"
   },
   "alerts": {
     "loadFailed": "项目列表加载失败",
     "createFailed": "项目创建失败",
-    "openFailed": "项目打开失败"
+    "openFailed": "项目打开失败",
+    "renameFailed": "重命名失败",
+    "deleteFailed": "删除失败",
+    "renameSuccess": "重命名成功",
+    "deleteSuccess": "删除成功"
   }
 }

@@ -3,6 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateProjectForm } from './CreateProjectForm';
 
+// Mock i18n
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 describe('CreateProjectForm', () => {
   const mockOnSubmit = vi.fn();
 
@@ -13,7 +20,6 @@ describe('CreateProjectForm', () => {
   it('应渲染表单', () => {
     render(<CreateProjectForm onSubmit={mockOnSubmit} />);
 
-    expect(screen.getByText(/title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/nameLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/descriptionLabel/i)).toBeInTheDocument();
   });

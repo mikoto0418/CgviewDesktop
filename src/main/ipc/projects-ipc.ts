@@ -6,6 +6,8 @@ const CHANNELS = {
   LIST_PROJECTS: 'projects:list',
   CREATE_PROJECT: 'projects:create',
   GET_PROJECT: 'projects:get',
+  UPDATE_PROJECT: 'projects:update',
+  DELETE_PROJECT: 'projects:delete',
   GET_ACTIVE_PROJECT: 'projects:getActive',
   SET_ACTIVE_PROJECT: 'projects:setActive'
 } as const;
@@ -49,6 +51,57 @@ export const registerProjectIpc = (persistence: PersistenceAdapter) => {
             error instanceof Error
               ? error.message
               : 'Unknown error occurred while creating project.'
+        };
+      }
+    }
+  );
+
+  ipcMain.handle(
+    CHANNELS.UPDATE_PROJECT,
+    async (_event, payload: { projectId: string; input: Partial<CreateProjectInput> }) => {
+      try {
+        if (!payload.projectId) {
+          throw new Error('Project id is required.');
+        }
+        if (payload.input.name !== undefined && !payload.input.name?.trim()) {
+          throw new Error('Project name cannot be empty.');
+        }
+
+        const project = await persistence.updateProject(payload.projectId, payload.input);
+
+        return { ok: true as const, data: project };
+      } catch (error) {
+        console.error('[IPC] Failed to update project', error);
+        return {
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Unknown error occurred while updating project.'
+        };
+      }
+    }
+  );
+
+  ipcMain.handle(
+    CHANNELS.DELETE_PROJECT,
+    async (_event, projectId: string) => {
+      try {
+        if (!projectId) {
+          throw new Error('Project id is required.');
+        }
+
+        await persistence.deleteProject(projectId);
+
+        return { ok: true as const, data: null };
+      } catch (error) {
+        console.error('[IPC] Failed to delete project', error);
+        return {
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Unknown error occurred while deleting project.'
         };
       }
     }

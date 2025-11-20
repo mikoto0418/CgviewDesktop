@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DatasetDetail } from '@shared/parser/types';
 import { getDefaultFeatureColor } from '@shared/constants/palette';
@@ -18,6 +18,39 @@ type LayerConfigPanelProps = {
   onLayerChange: (layers: LayerVisibility[]) => void;
 };
 
+const normalizeFeatureType = (value: unknown): string => {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : 'unknown';
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    const joined = value
+      .map((item) => normalizeFeatureType(item))
+      .filter((item) => item !== 'unknown')
+      .join(', ');
+    return joined.length > 0 ? joined : 'unknown';
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const candidate =
+      record.name ??
+      record.type ??
+      record.id ??
+      record.key ??
+      record.label;
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      if (trimmed.length > 0) {
+        return trimmed;
+      }
+    }
+  }
+  return 'unknown';
+};
+
 export const LayerConfigPanel = ({
   dataset,
   onLayerChange
@@ -31,7 +64,7 @@ export const LayerConfigPanel = ({
 
     const types = new Map<string, number>();
     dataset.features.forEach((feature) => {
-      const type = (feature as any).type || 'unknown';
+      const type = normalizeFeatureType((feature as any).type);
       types.set(type, (types.get(type) || 0) + 1);
     });
 
@@ -43,15 +76,14 @@ export const LayerConfigPanel = ({
   }, [dataset]);
 
   // Initialize layers when dataset changes
-  useMemo(() => {
-  useMemo(() => {
+  useEffect(() => {
     console.log('[LayerConfigPanel] Initializing layers for featureTypes:', featureTypes);
     if (featureTypes.length > 0) {
-      const initialLayers: LayerVisibility[] = featureTypes.map((ft, index) => ({
+      const initialLayers: LayerVisibility[] = featureTypes.map((ft) => ({
         type: ft.type,
         visible: true,
         color: ft.color,
-        labelVisible: ft.count < 20, // Only show labels for features with fewer instances
+        labelVisible: ft.count < 20,
         labelField: 'name',
         opacity: 0.8
       }));
@@ -61,9 +93,9 @@ export const LayerConfigPanel = ({
     } else {
       console.log('[LayerConfigPanel] No feature types found, clearing layers');
       setLayers([]);
+      onLayerChange([]);
     }
-  }, [dataset?.id, featureTypes.length]); // 依赖数据集ID和特征类型数量
-  }, [dataset?.id, featureTypes.length]);
+  }, [dataset?.id, featureTypes.length, onLayerChange]);
   const handleVisibilityToggle = (type: string) => {
     const updated = layers.map((layer) =>
       layer.type === type ? { ...layer, visible: !layer.visible } : layer
@@ -139,20 +171,22 @@ export const LayerConfigPanel = ({
   }
 
   return (
-    <div className="panel">
+    <div className="panel animate-fade-in">
       <div className="panel-header">
-        <span className="panel-icon">🎨</span>
-        <div>
-          <h3 className="panel-title">{t('layers.title')}</h3>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="panel-icon">🎨</span>
+            <h3 className="panel-title">{t('layers.title')}</h3>
+          </div>
           <p className="panel-description">
             控制特征图层的显示方式和样式
           </p>
         </div>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
-          <button onClick={handleShowAll} className="btn btn-secondary">
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={handleShowAll} className="btn-secondary">
             {t('layers.showAll')}
           </button>
-          <button onClick={handleHideAll} className="btn btn-secondary">
+          <button onClick={handleHideAll} className="btn-secondary">
             {t('layers.hideAll')}
           </button>
         </div>
@@ -172,34 +206,58 @@ export const LayerConfigPanel = ({
           const featureType = featureTypes.find((ft) => ft.type === layer.type);
           return (
             <li key={layer.type} className="panel-item">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                <input
-                  type="checkbox"
-                  checked={layer.visible}
-                  onChange={() => handleVisibilityToggle(layer.type)}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                />
-                <span style={{ fontWeight: 500, color: 'rgba(226, 232, 240, 0.95)', fontSize: '1rem' }}>
-                  {layer.type}
-                  {featureType && (
-                    <span style={{ color: 'rgba(148, 163, 184, 0.8)', marginLeft: '0.5rem' }}>
-                      ({featureType.count})
-                    </span>
-                  )}
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={layer.visible}
+                    onChange={() => handleVisibilityToggle(layer.type)}
+                    style={{ width: '18px', height: '18px', accentColor: 'var(--system-blue)' }}
+                  />
+                  <span style={{ fontWeight: 600, fontSize: '15px', color: 'var(--system-text-primary)' }}>
+                    {layer.type}
+                    {featureType && (
+                      <span style={{ color: 'var(--system-text-tertiary)', marginLeft: '6px', fontWeight: 400, fontSize: '13px' }}>
+                        ({featureType.count})
+                      </span>
+                    )}
+                  </span>
+                </label>
+                
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: layer.visible ? 'pointer' : 'not-allowed', opacity: layer.visible ? 1 : 0.5 }}>
+                  <input
+                    type="checkbox"
+                    checked={layer.labelVisible}
+                    onChange={() => handleLabelToggle(layer.type)}
+                    disabled={!layer.visible}
+                  />
+                  <span style={{ fontSize: '12px', color: 'var(--system-text-secondary)' }}>{t('layers.showLabels')}</span>
+                </label>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="control-group">
                   <label className="control-label">{t('layers.color')}</label>
-                  <input
-                    type="color"
-                    value={layer.color}
-                    onChange={(e) => handleColorChange(layer.type, e.target.value)}
-                    disabled={!layer.visible}
-                    className="control-input"
-                    style={{ padding: '0.25rem', height: '40px', cursor: layer.visible ? 'pointer' : 'not-allowed' }}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="color"
+                      value={layer.color}
+                      onChange={(e) => handleColorChange(layer.type, e.target.value)}
+                      disabled={!layer.visible}
+                      style={{ 
+                        width: '32px', 
+                        height: '32px', 
+                        padding: 0, 
+                        border: 'none', 
+                        borderRadius: '6px', 
+                        cursor: layer.visible ? 'pointer' : 'not-allowed',
+                        background: 'none'
+                      }}
+                    />
+                    <span style={{ fontSize: '12px', color: 'var(--system-text-secondary)', fontFamily: 'monospace' }}>
+                      {layer.color.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="control-group">
@@ -214,21 +272,12 @@ export const LayerConfigPanel = ({
                     value={layer.opacity}
                     onChange={(e) => handleOpacityChange(layer.type, parseFloat(e.target.value))}
                     disabled={!layer.visible}
-                    style={{ cursor: layer.visible ? 'pointer' : 'not-allowed' }}
+                    style={{ 
+                      width: '100%', 
+                      cursor: layer.visible ? 'pointer' : 'not-allowed',
+                      accentColor: 'var(--system-blue)'
+                    }}
                   />
-                </div>
-
-                <div className="control-group">
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: layer.visible ? 'pointer' : 'not-allowed' }}>
-                    <input
-                      type="checkbox"
-                      checked={layer.labelVisible}
-                      onChange={() => handleLabelToggle(layer.type)}
-                      disabled={!layer.visible}
-                      style={{ width: '18px', height: '18px' }}
-                    />
-                    <span className="control-label" style={{ margin: 0 }}>{t('layers.showLabels')}</span>
-                  </label>
                 </div>
               </div>
             </li>
@@ -238,10 +287,12 @@ export const LayerConfigPanel = ({
 
       {layers.length === 0 && (
         <div style={{
-          padding: '3rem',
+          padding: '40px',
           textAlign: 'center',
-          color: 'rgba(148, 163, 184, 0.6)',
-          fontSize: '1rem'
+          color: 'var(--system-text-tertiary)',
+          background: 'var(--system-background-secondary)',
+          borderRadius: '12px',
+          border: '1px dashed var(--system-divider)'
         }}>
           <p>{t('layers.noData')}</p>
         </div>

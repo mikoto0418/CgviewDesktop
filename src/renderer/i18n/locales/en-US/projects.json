@@ -4,6 +4,10 @@
     "empty": "No projects yet. Create one to get started!",
     "createdAt": "Created {{date}}"
   },
+  "actions": {
+    "rename": "Rename",
+    "edit": "Edit"
+  },
   "form": {
     "title": "Create Project",
     "nameLabel": "Project Name",
@@ -20,11 +24,18 @@
     "noDescription": "No description provided.",
     "createdAt": "Created at",
     "updatedAt": "Last updated",
-    "openAction": "Open project (coming soon)"
+    "openAction": "Open Project",
+    "renameAction": "Rename Project",
+    "deleteConfirm": "Are you sure you want to delete project \"{{name}}\"? All related data will be permanently deleted.",
+    "renamePlaceholder": "Project name"
   },
   "alerts": {
     "loadFailed": "Failed to load projects.",
     "createFailed": "Failed to create project.",
-    "openFailed": "Failed to open project."
+    "openFailed": "Failed to open project.",
+    "renameFailed": "Failed to rename project.",
+    "deleteFailed": "Failed to delete project.",
+    "renameSuccess": "Project renamed successfully.",
+    "deleteSuccess": "Project deleted successfully."
   }
 }

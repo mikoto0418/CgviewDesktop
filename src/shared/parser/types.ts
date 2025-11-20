@@ -85,6 +85,7 @@ export interface PersistedDataset {
   featureStates?: FeatureStateMap;
   plotTracks?: PlotTrack[];
   linkTracks?: LinkTrack[];
+  statistics?: DatasetStatistics;
 }
 
 export interface ParseDatasetResponse {

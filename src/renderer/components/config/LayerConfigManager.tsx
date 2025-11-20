@@ -11,7 +11,7 @@ export const LayerConfigManager = ({
   currentLayers,
   onApplyConfig
 }: LayerConfigManagerProps) => {
-  const { t } = useTranslation('workspace');
+  const { t } = useTranslation(['workspace', 'common']);
   const [configs, setConfigs] = useState<LayerConfigTemplate[]>([]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
@@ -181,14 +181,14 @@ export const LayerConfigManager = ({
                 setError(null);
               }}
             >
-              {t('common.cancel')}
+              {t('common:common.cancel')}
             </button>
             <button
               className="btn btn-primary"
               onClick={handleSave}
               disabled={!saveName.trim()}
             >
-              {t('common.save')}
+              {t('common:common.save')}
             </button>
           </div>
         </div>
@@ -249,7 +249,7 @@ export const LayerConfigManager = ({
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(config.id)}
-                        title={t('common.delete')}
+                        title={t('common:common.delete')}
                       >
                         🗑
                       </button>
@@ -275,7 +275,7 @@ export const LayerConfigManager = ({
               className="btn btn-secondary"
               onClick={() => setShowLoadDialog(false)}
             >
-              {t('common.close')}
+              {t('common:common.close')}
             </button>
           </div>
         </div>

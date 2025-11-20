@@ -4,6 +4,7 @@ import type { ProjectSummary } from '@shared/domain/project';
 import { EnhancedWorkspaceView } from './EnhancedWorkspaceView';
 import { ImportService } from '../../services/import-service';
 import type { DatasetSummary } from '@shared/parser/types';
+import { DataImportWizard } from '../import/DataImportWizard';
 
 interface WorkspaceIntegrationViewProps {
   project: ProjectSummary | null;
@@ -75,58 +76,59 @@ export const WorkspaceIntegrationView = ({
   // 当项目为空时，显示空状态
   if (!project) {
     return (
-      <div className="workspace">
-        <div className="workspace__empty">
-          <p>{t('workspace:empty')}</p>
-          <button type="button" onClick={onExit}>
-            {t('workspace:actions.back')}
-          </button>
-        </div>
+      <div className="flex-center" style={{ height: '100%', flexDirection: 'column', gap: '20px' }}>
+        <p style={{ fontSize: '18px', color: 'var(--system-text-secondary)' }}>{t('workspace:empty')}</p>
+        <button type="button" onClick={onExit} className="btn-apple-secondary">
+          {t('workspace:actions.back')}
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="workspace-main-container">
-      {/* 顶部导航栏 */}
-      <header className="workspace-main-header">
-        <div className="workspace-main-header-content">
-          <div className="workspace-main-title">
-            <h1>{project.name}</h1>
-            <p className="workspace-main-subtitle">
-              {project.description ?? t('workspace:noDescription')}
-            </p>
-          </div>
-          <div className="workspace-main-meta">
-            <div className="meta-item">
-              <span className="meta-label">{t('workspace:meta.createdAt')}</span>
-              <span className="meta-value">
-                {new Date(project.createdAt).toLocaleString()}
-              </span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">{t('workspace:meta.updatedAt')}</span>
-              <span className="meta-value">
-                {new Date(project.updatedAt).toLocaleString()}
-              </span>
-            </div>
-          </div>
-          <button type="button" onClick={onExit} className="btn-exit">
-            {t('workspace:actions.back')}
+    <div className="flex-col" style={{ height: '100vh', width: '100%', background: 'var(--system-background)' }}>
+      {/* 顶部工具栏 */}
+      <header style={{ 
+        height: '60px',
+        padding: '0 24px', 
+        borderBottom: '1px solid var(--system-divider)',
+        background: 'var(--glass-background)',
+        backdropFilter: 'blur(20px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        zIndex: 10
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button 
+            type="button" 
+            onClick={onExit} 
+            className="btn-apple-secondary"
+            style={{ padding: '6px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            <span>←</span> {t('workspace:actions.back')}
           </button>
-        </div>
-      </header>
+          
+          <div style={{ width: '1px', height: '24px', background: 'var(--system-divider)' }} />
 
-      {/* 数据集选择器 */}
-      <div className="workspace-dataset-bar">
-        <div className="workspace-dataset-selector">
-          <label>
-            <span>{t('workspace:datasets.title')}</span>
+          <div>
+            <h1 style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>{project.name}</h1>
+          </div>
+
+          {/* 数据集选择器 - 集成在顶部栏 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '20px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--system-text-secondary)' }}>{t('workspace:datasets.title')}:</span>
             <select
               value={selectedDatasetId || ''}
               onChange={(e) => setSelectedDatasetId(e.target.value)}
               disabled={datasetsLoading || datasets.length === 0}
-              className="dataset-select"
+              style={{ 
+                width: '240px', 
+                padding: '4px 8px', 
+                fontSize: '13px',
+                background: 'var(--system-background-tertiary)',
+                border: 'none'
+              }}
             >
               <option value="">{t('workspace:datasets.empty')}</option>
               {datasets.map((dataset) => (
@@ -135,22 +137,38 @@ export const WorkspaceIntegrationView = ({
                 </option>
               ))}
             </select>
-          </label>
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--system-text-secondary)' }}>
           {datasets.length > 0 && (
-            <span className="dataset-count">
+            <span style={{ background: 'var(--system-background-secondary)', padding: '4px 8px', borderRadius: '6px' }}>
               {datasets.length} {t('workspace:datasets.recordCount', { count: '' })}
             </span>
           )}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+             <span>{new Date(project.updatedAt).toLocaleDateString()}</span>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* 主体内容区域 - 左右分栏布局 */}
-      <div className="workspace-main-content">
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         {datasetDetail ? (
           <EnhancedWorkspaceView dataset={datasetDetail} />
         ) : (
-          <div className="workspace-main-empty">
-            <p>{t('workspace:datasets.empty')}</p>
+          <div className="flex-center" style={{ height: '100%', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ width: '100%', maxWidth: '600px', padding: '20px' }}>
+              <div className="card glass-panel">
+                <DataImportWizard 
+                  projectId={project.id} 
+                  onImported={(response: any) => {
+                    refreshDatasets();
+                    setSelectedDatasetId(response.dataset.id);
+                  }} 
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>

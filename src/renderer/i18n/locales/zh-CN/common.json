@@ -12,7 +12,15 @@
     "save": "保存",
     "close": "关闭",
     "delete": "删除",
+    "remove": "移除",
     "confirm": "确认",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "nav": {
+      "dashboard": "仪表盘",
+      "projects": "我的项目",
+      "workspace": "工作区",
+      "settings": "设置",
+      "help": "帮助"
+    }
   }
 }

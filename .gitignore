@@ -2,8 +2,15 @@
 node_modules/
 dist/
 release/
+out/
+build/
 .env
+
+# Data & Database
 data/
+*.db
+*.sqlite
+*.sqlite3
 
 # Logs & temp
 npm-debug.log*
@@ -12,6 +19,8 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 Thumbs.db
+desktop.ini
+nul
 
 # IDE
 .idea/
@@ -19,4 +28,20 @@ Thumbs.db
 *.swp
 *.swo
 
+# Development docs (keep local only)
+开发*.md
+文档*.md
+目前*.md
+*_v*.md
+FEATURE_*.md
+CONTRIBUTING.md
+CHANGELOG.md
+QUICK_START_GUIDE.md
+USER_MANUAL.md
+
+# Temporary directories
+.serena/
+.claude/
+
+# Generated
 /generated/prisma

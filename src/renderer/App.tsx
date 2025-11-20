@@ -1,59 +1,15 @@
 ﻿import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ProjectList } from "./components/ProjectList";
-import { CreateProjectForm } from "./components/CreateProjectForm";
 import { useProjectStore } from "./state/project-store";
-import { ProjectDetailPanel } from "./components/ProjectDetailPanel";
-import { DataImportWizard } from "./modules/import/DataImportWizard";
 import { WorkspaceIntegrationView } from "./modules/workspace/WorkspaceIntegrationView";
-
-const languages = [
-  { code: "zh-CN", labelKey: "common:language.zhCN" },
-  { code: "en-US", labelKey: "common:language.enUS" }
-] as const;
-
-const AppShell = ({ children }: { children: React.ReactNode }) => {
-  const { t } = useTranslation("common");
-
-  return (
-    <div className="app-shell">
-      <header className="app-shell__header">
-        <h1>{t("app.name")}</h1>
-        <LanguageSwitcher />
-      </header>
-      <main className="app-shell__content">{children}</main>
-    </div>
-  );
-};
-
-const LanguageSwitcher = () => {
-  const { i18n, t } = useTranslation("common");
-
-  return (
-    <select
-      value={i18n.language}
-      onChange={(event) => {
-        i18n.changeLanguage(event.target.value);
-      }}
-    >
-      {languages.map((item) => (
-        <option key={item.code} value={item.code}>
-          {t(item.labelKey)}
-        </option>
-      ))}
-    </select>
-  );
-};
+import { MainLayout } from "./components/Layout/MainLayout";
+import { Dashboard } from "./components/Dashboard";
 
 const AppContent = () => {
-  const { t } = useTranslation([
-    "dashboard",
-    "projects",
-    "common",
-    "import",
-    "workspace"
-  ]);
+  const { t } = useTranslation(["projects", "common"]);
   const [error, setError] = useState<string | null>(null);
+  
+  // Store state
   const projects = useProjectStore((state) => state.projects);
   const selectedId = useProjectStore((state) => state.selectedId);
   const loading = useProjectStore((state) => state.loading);
@@ -61,28 +17,30 @@ const AppContent = () => {
   const view = useProjectStore((state) => state.view);
   const loadProjects = useProjectStore((state) => state.loadProjects);
   const createProject = useProjectStore((state) => state.createProject);
+  const updateProject = useProjectStore((state) => state.updateProject);
+  const deleteProject = useProjectStore((state) => state.deleteProject);
   const selectProject = useProjectStore((state) => state.selectProject);
   const openProject = useProjectStore((state) => state.openProject);
   const exitWorkspace = useProjectStore((state) => state.exitWorkspace);
 
-  const runtimeInfo = useMemo(() => {
-    if (!window.appBridge) {
-      return { version: "unknown", platform: "unknown" };
-    }
+  // Derived state
+  const selectedProject = useMemo(
+    () => projects.find((project) => project.id === selectedId) ?? null,
+    [projects, selectedId]
+  );
 
-    return {
-      version: window.appBridge.version,
-      platform: window.appBridge.platform
-    };
-  }, []);
-
+  // Initial load
   useEffect(() => {
-    loadProjects().catch((err) => {
-      console.error(err);
-      setError(t("projects:alerts.loadFailed"));
-    });
+    console.info('[renderer] App initializing...');
+    loadProjects()
+      .then(() => console.info('[renderer] Projects loaded'))
+      .catch((err) => {
+        console.error('[renderer] Failed to load projects:', err);
+        setError(t("projects:alerts.loadFailed"));
+      });
   }, [loadProjects, t]);
 
+  // Handlers
   const handleCreate = useCallback(
     async (input: { name: string; description?: string }) => {
       try {
@@ -96,99 +54,86 @@ const AppContent = () => {
     [createProject, t]
   );
 
-  const handleExitWorkspace = useCallback(() => {
-    exitWorkspace();
-    setError(null);
-  }, [exitWorkspace]);
+  const handleOpenProject = useCallback(async (project: any) => {
+    try {
+      await openProject(project.id);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError(t("projects:alerts.openFailed"));
+    }
+  }, [openProject, t]);
 
-  const selectedProject = useMemo(
-    () => projects.find((project) => project.id === selectedId) ?? null,
-    [projects, selectedId]
-  );
+  const handleRenameProject = useCallback(async (projectId: string, name: string, description?: string) => {
+    try {
+      await updateProject(projectId, name, description);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError(t("projects:alerts.renameFailed"));
+      throw err;
+    }
+  }, [updateProject, t]);
 
-  if (view === 'workspace') {
+  const handleDeleteProject = useCallback(async (project: any) => {
+    try {
+      await deleteProject(project.id);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError(t("projects:alerts.deleteFailed"));
+      throw err;
+    }
+  }, [deleteProject, t]);
+
+  const handleNavigate = useCallback((newView: string) => {
+    if (newView === 'dashboard') {
+      exitWorkspace();
+    } else if (newView === 'workspace') {
+      if (selectedId) {
+        openProject(selectedId);
+      }
+    }
+    // Handle other views if added
+  }, [exitWorkspace, openProject, selectedId]);
+
+  // Render Content based on View
+  const renderContent = () => {
+    if (view === 'workspace') {
+      return (
+        <WorkspaceIntegrationView 
+          project={selectedProject} 
+          onExit={exitWorkspace} 
+        />
+      );
+    }
+
     return (
-      <div className="app-shell__content app-shell__content--workspace">
-        {error ? <div className="alert alert--error">{error}</div> : null}
-        <WorkspaceIntegrationView project={selectedProject} onExit={handleExitWorkspace} />
-      </div>
+      <Dashboard
+        projects={projects}
+        selectedId={selectedId}
+        loading={loading}
+        isCreating={isCreating}
+        error={error}
+        onSelectProject={selectProject}
+        onCreateProject={handleCreate}
+        onRenameProject={handleRenameProject}
+        onDeleteProject={handleDeleteProject}
+        onOpenProject={handleOpenProject}
+      />
     );
-  }
+  };
 
   return (
-    <section className="dashboard">
-      <header className="dashboard__header">
-        <div>
-          <h2>{t("dashboard:title")}</h2>
-          <p>{t("dashboard:subtitle")}</p>
-        </div>
-        <div className="runtime-card">
-          <p>
-            {t("dashboard:runtime.version")}: {runtimeInfo.version}
-          </p>
-          <p>
-            {t("dashboard:runtime.platform")}: {runtimeInfo.platform}
-          </p>
-        </div>
-      </header>
-
-      {error ? <div className="alert alert--error">{error}</div> : null}
-
-      <section className="dashboard__grid">
-        <article className="card card--list">
-          <header className="card__header">
-            <h3>{t("projects:list.title")}</h3>
-            {loading ? <span className="badge">{t("app.loading")}</span> : null}
-          </header>
-          <ProjectList
-            projects={projects}
-            selectedId={selectedId}
-            onSelect={(project) => selectProject(project.id)}
-          />
-        </article>
-        <div className="dashboard__stack">
-          <article className="card">
-            <ProjectDetailPanel
-              project={selectedProject}
-              onOpen={async (project) => {
-                try {
-                  await openProject(project.id);
-                  setError(null);
-                } catch (err) {
-                  console.error(err);
-                  setError(t("projects:alerts.openFailed"));
-                }
-              }}
-            />
-          </article>
-          {selectedProject ? (
-            <article className="card">
-              <DataImportWizard projectId={selectedProject.id} />
-            </article>
-          ) : null}
-          <article className="card">
-            <CreateProjectForm onSubmit={handleCreate} isSubmitting={isCreating} />
-          </article>
-        </div>
-      </section>
-
-      <div className="placeholder">
-        <h3>{t("dashboard:nextSteps.title")}</h3>
-        <ul>
-          <li>{t("dashboard:nextSteps.importData")}</li>
-          <li>{t("dashboard:nextSteps.configureLayers")}</li>
-          <li>{t("dashboard:nextSteps.prepareRendering")}</li>
-        </ul>
-      </div>
-    </section>
+    <MainLayout activeView={view} onNavigate={handleNavigate}>
+      {renderContent()}
+    </MainLayout>
   );
 };
 
 const App = () => (
-  <Suspense fallback={<span>Loading...</span>}>
-    <AppShell>
-      <AppContent />
-    </AppShell>
+  <Suspense fallback={<div className="flex-center" style={{ height: '100vh' }}>Loading...</div>}>
+    <AppContent />
   </Suspense>
 );
 

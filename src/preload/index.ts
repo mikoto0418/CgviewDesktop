@@ -24,6 +24,8 @@ const PROJECT_CHANNELS = {
   LIST: 'projects:list',
   CREATE: 'projects:create',
   GET: 'projects:get',
+  UPDATE: 'projects:update',
+  DELETE: 'projects:delete',
   GET_ACTIVE: 'projects:getActive',
   SET_ACTIVE: 'projects:setActive'
 } as const;
@@ -78,6 +80,13 @@ try {
       listProjects: () => invoke<ProjectSummary[]>(PROJECT_CHANNELS.LIST),
       createProject: (input: CreateProjectInput) =>
         invoke<ProjectSummary, CreateProjectInput>(PROJECT_CHANNELS.CREATE, input),
+      updateProject: (projectId: string, input: Partial<CreateProjectInput>) =>
+        invoke<ProjectSummary, { projectId: string; input: Partial<CreateProjectInput> }>(
+          PROJECT_CHANNELS.UPDATE, 
+          { projectId, input }
+        ),
+      deleteProject: (projectId: string) =>
+        invoke<void, string>(PROJECT_CHANNELS.DELETE, projectId),
       getProject: (projectId: string) =>
         invoke<ProjectSummary | null, string>(PROJECT_CHANNELS.GET, projectId),
       getActiveProjectId: () =>

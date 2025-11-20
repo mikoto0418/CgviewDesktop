@@ -1,0 +1,139 @@
+{
+  "name": "Escherichia coli K-12 MG1655",
+  "version": "1.0",
+  "sequence": {
+    "length": 4641652,
+    "topology": "circular",
+    "gcContent": 50.8
+  },
+  "features": [
+    {
+      "type": "CDS",
+      "name": "thrL",
+      "start": 190,
+      "stop": 255,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "CDS"
+    },
+    {
+      "type": "CDS",
+      "name": "thrA",
+      "start": 337,
+      "stop": 2799,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "CDS"
+    },
+    {
+      "type": "CDS",
+      "name": "thrB",
+      "start": 2801,
+      "stop": 3733,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "CDS"
+    },
+    {
+      "type": "CDS",
+      "name": "thrC",
+      "start": 3734,
+      "stop": 5020,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "CDS"
+    },
+    {
+      "type": "rRNA",
+      "name": "rrnB-16S",
+      "start": 4164414,
+      "stop": 4165955,
+      "strand": -1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "rRNA"
+    },
+    {
+      "type": "rRNA",
+      "name": "rrnB-23S",
+      "start": 4166496,
+      "stop": 4169399,
+      "strand": -1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "rRNA"
+    },
+    {
+      "type": "tRNA",
+      "name": "ileT",
+      "start": 190,
+      "stop": 255,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "tRNA"
+    },
+    {
+      "type": "gene",
+      "name": "dnaA",
+      "start": 10000,
+      "stop": 11500,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "gene"
+    },
+    {
+      "type": "gene",
+      "name": "dnaN",
+      "start": 11600,
+      "stop": 12800,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "gene"
+    },
+    {
+      "type": "gene",
+      "name": "recF",
+      "start": 13000,
+      "stop": 14000,
+      "strand": 1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "gene"
+    },
+    {
+      "type": "gene",
+      "name": "gyrB",
+      "start": 15000,
+      "stop": 17000,
+      "strand": -1,
+      "source": "GenBank",
+      "contig": "NC_000913.3",
+      "legend": "gene"
+    }
+  ],
+  "plotTracks": [
+    {
+      "id": "gc-content-1",
+      "name": "GC Content",
+      "type": "gc-content",
+      "visible": true,
+      "color": "#0071e3",
+      "windowSize": 1000
+    },
+    {
+      "id": "gc-skew-1",
+      "name": "GC Skew",
+      "type": "gc-skew",
+      "visible": true,
+      "color": "#34c759",
+      "windowSize": 1000
+    }
+  ]
+}

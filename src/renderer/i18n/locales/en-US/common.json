@@ -12,6 +12,7 @@
     "save": "Save",
     "close": "Close",
     "delete": "Delete",
+    "remove": "Remove",
     "confirm": "Confirm",
     "loading": "Loading..."
   }

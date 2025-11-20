@@ -27,42 +27,51 @@ export const ProjectList = ({
 
   if (projects.length === 0) {
     return (
-      <div className="project-list project-list--empty">
+      <div className="flex-center" style={{ padding: '40px', color: 'var(--system-text-tertiary)', flexDirection: 'column', gap: '10px' }}>
+        <span style={{ fontSize: '48px' }}>📂</span>
         <p>{t('list.empty')}</p>
       </div>
     );
   }
 
   return (
-    <ul className="project-list">
+    <div className="project-list" style={{ display: 'grid', gap: '12px' }}>
       {projects.map((project) => (
-        <li
+        <div
           key={project.id}
-          className={
-            selectedId === project.id
-              ? 'project-list__item project-list__item--active'
-              : 'project-list__item'
-          }
+          onClick={() => onSelect?.(project)}
+          style={{
+            padding: '12px 16px',
+            borderRadius: '10px',
+            background: selectedId === project.id ? 'var(--system-blue)' : 'transparent',
+            color: selectedId === project.id ? 'white' : 'var(--system-text-primary)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: '1px solid transparent',
+          }}
+          className={`${selectedId !== project.id ? 'list-item-hover' : ''} ${selectedId === project.id ? 'selected' : ''}`}
         >
-          <button
-            type="button"
-            onClick={() => onSelect?.(project)}
-            className="project-list__button"
-          >
-            <span className="project-list__name">{project.name}</span>
-            {project.description ? (
-              <span className="project-list__description">
-                {project.description}
-              </span>
-            ) : null}
-            <span className="project-list__meta">
-              {t('list.createdAt', {
-                date: dateFormatter.format(new Date(project.createdAt))
-              })}
+          <div className="flex-between mb-2">
+            <span style={{ fontWeight: 600, fontSize: '16px' }}>{project.name}</span>
+            <span style={{ fontSize: '12px', opacity: 0.8 }}>
+              {dateFormatter.format(new Date(project.createdAt))}
             </span>
-          </button>
-        </li>
+          </div>
+          {project.description && (
+            <p style={{ 
+              fontSize: '14px', 
+              margin: 0, 
+              opacity: 0.9, 
+              whiteSpace: 'nowrap', 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis',
+              color: selectedId === project.id ? 'rgba(255,255,255,0.9)' : 'var(--system-text-secondary)'
+            }}>
+              {project.description}
+            </p>
+          )}
+        </div>
       ))}
-    </ul>
+    </div>
   );
 };

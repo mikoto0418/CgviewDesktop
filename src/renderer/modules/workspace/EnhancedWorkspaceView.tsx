@@ -25,9 +25,19 @@ type FilterCriteria = {
   containsText?: string;
 };
 
+type PlotTrackType =
+  | 'gc-content'
+  | 'gc-skew'
+  | 'coverage'
+  | 'at-content'
+  | 'base-composition'
+  | 'feature-density'
+  | 'sequence-complexity'
+  | 'custom';
+
 type PlotTrack = {
   id: string;
-  type: 'gc-content' | 'gc-skew' | 'coverage' | 'custom';
+  type: PlotTrackType;
   name: string;
   visible: boolean;
   color: string;
@@ -47,6 +57,19 @@ export const EnhancedWorkspaceView = ({
   const [layers, setLayers] = useState<LayerVisibility[]>([]);
   const [filter, setFilter] = useState<FilterCriteria | null>(null);
   const [plotTracks, setPlotTracks] = useState<PlotTrack[]>([]);
+
+  useEffect(() => {
+    if (!dataset) {
+      setPlotTracks([]);
+      return;
+    }
+    if (dataset.plotTracks && dataset.plotTracks.length > 0) {
+      setPlotTracks(dataset.plotTracks as PlotTrack[]);
+    } else {
+      setPlotTracks([]);
+    }
+  }, [dataset?.id, dataset?.plotTracks]);
+
 
   // 调试信息 - 帮助排查问题
   console.log('[EnhancedWorkspaceView] dataset:', dataset);
@@ -189,7 +212,7 @@ export const EnhancedWorkspaceView = ({
   }, [visualizedDataset, plotTracks]);
 
   // Generate GC content plot data
-  const generateGCContentTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateGCContentTrack(dataset: DatasetDetail, track: PlotTrack) {
     const windowSize = track.windowSize || 100;
     const features = dataset.features;
     if (features.length === 0) return null;
@@ -234,10 +257,10 @@ export const EnhancedWorkspaceView = ({
       axisMin: 0,
       axisMax: 100
     };
-  };
+  }
 
   // Generate GC skew plot data
-  const generateGCSkewTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateGCSkewTrack(dataset: DatasetDetail, track: PlotTrack) {
     const windowSize = track.windowSize || 100;
     const features = dataset.features;
     if (features.length === 0) return null;
@@ -280,10 +303,10 @@ export const EnhancedWorkspaceView = ({
       axisMin: -1,
       axisMax: 1
     };
-  };
+  }
 
   // Generate coverage plot data
-  const generateCoverageTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateCoverageTrack(dataset: DatasetDetail, track: PlotTrack) {
     const features = dataset.features;
     if (features.length === 0) return null;
 
@@ -318,10 +341,10 @@ export const EnhancedWorkspaceView = ({
       visible: true,
       color: track.color
     };
-  };
+  }
 
   // Generate AT content plot data
-  const generateATContentTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateATContentTrack(dataset: DatasetDetail, track: PlotTrack) {
     const windowSize = track.windowSize || 100;
     const features = dataset.features;
     if (features.length === 0) return null;
@@ -366,10 +389,10 @@ export const EnhancedWorkspaceView = ({
       axisMin: 0,
       axisMax: 100
     };
-  };
+  }
 
   // Generate base composition plot data
-  const generateBaseCompositionTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateBaseCompositionTrack(dataset: DatasetDetail, track: PlotTrack) {
     const windowSize = track.windowSize || 100;
     const features = dataset.features;
     if (features.length === 0) return null;
@@ -415,10 +438,10 @@ export const EnhancedWorkspaceView = ({
       axisMin: -1,
       axisMax: 1
     };
-  };
+  }
 
   // Generate feature density plot data
-  const generateFeatureDensityTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateFeatureDensityTrack(dataset: DatasetDetail, track: PlotTrack) {
     const windowSize = track.windowSize || 1000;
     const features = dataset.features;
     if (features.length === 0) return null;
@@ -458,10 +481,10 @@ export const EnhancedWorkspaceView = ({
       color: track.color,
       axisMin: 0
     };
-  };
+  }
 
   // Generate sequence complexity plot data
-  const generateSequenceComplexityTrack = (dataset: DatasetDetail, track: PlotTrack) => {
+  function generateSequenceComplexityTrack(dataset: DatasetDetail, track: PlotTrack) {
     const windowSize = track.windowSize || 200;
     const features = dataset.features;
     if (features.length === 0) return null;
@@ -505,7 +528,7 @@ export const EnhancedWorkspaceView = ({
       axisMin: 0,
       axisMax: 100
     };
-  };
+  }
 
   // 构建左侧面板内容
   const leftPanelContent = (
@@ -574,6 +597,7 @@ export const EnhancedWorkspaceView = ({
           {activeTab === 'plots' && (
             <PlotTrackManager
               dataset={dataset}
+              tracks={plotTracks}
               onTracksChange={setPlotTracks}
             />
           )}
@@ -614,8 +638,8 @@ export const EnhancedWorkspaceView = ({
     <ResizablePanel
       leftPanel={leftPanelContent}
       rightPanel={rightPanelContent}
-      defaultLeftWidth={0.7}
-      minLeftWidth={0.3}
+      defaultLeftWidth={0.55}
+      minLeftWidth={0.35}
       maxLeftWidth={0.9}
       className="workspace-enhanced-layout"
     />

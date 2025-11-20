@@ -75,5 +75,27 @@ export const ProjectService = {
       return;
     }
     await bridge.setActiveProjectId(projectId);
+  },
+
+  async update(projectId: string, input: Partial<CreateProjectInput>): Promise<ProjectSummary> {
+    if (!window.appBridge?.updateProject) {
+      throw new Error('Update project API is not available. Are you running inside Electron?');
+    }
+    const bridge = ensureBridge();
+    if (!bridge.updateProject) {
+      throw new Error('Update project API is not available.');
+    }
+    return bridge.updateProject(projectId, input);
+  },
+
+  async delete(projectId: string): Promise<void> {
+    if (!window.appBridge?.deleteProject) {
+      throw new Error('Delete project API is not available. Are you running inside Electron?');
+    }
+    const bridge = ensureBridge();
+    if (!bridge.deleteProject) {
+      throw new Error('Delete project API is not available.');
+    }
+    await bridge.deleteProject(projectId);
   }
 };

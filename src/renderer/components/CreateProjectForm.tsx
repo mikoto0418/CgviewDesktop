@@ -31,11 +31,15 @@ export const CreateProjectForm = ({
   };
 
   return (
-    <form className="project-form" onSubmit={handleSubmit}>
-      <h3>{t('form.title')}</h3>
-      <label className="project-form__field">
-        <span>{t('form.nameLabel')}</span>
+    <form onSubmit={handleSubmit}>
+      {/* Title removed, handled by parent/modal */}
+      
+      <div className="flex-col gap-2 mb-4">
+        <label htmlFor="projectName" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--system-text-secondary)' }}>
+          {t('form.nameLabel')}
+        </label>
         <input
+          id="projectName"
           type="text"
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -43,18 +47,28 @@ export const CreateProjectForm = ({
           required
           minLength={2}
         />
-      </label>
-      <label className="project-form__field">
-        <span>{t('form.descriptionLabel')}</span>
+      </div>
+
+      <div className="flex-col gap-2 mb-4">
+        <label htmlFor="projectDescription" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--system-text-secondary)' }}>
+          {t('form.descriptionLabel')}
+        </label>
         <textarea
+          id="projectDescription"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           placeholder={t('form.descriptionPlaceholder')}
           rows={3}
+          style={{ resize: 'none' }}
         />
-      </label>
-      <div className="project-form__actions">
-        <button type="submit" disabled={isSubmitting || !name.trim()}>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button 
+          type="submit" 
+          disabled={isSubmitting || !name.trim()}
+          className="btn-apple"
+        >
           {isSubmitting ? t('form.submitting') : t('form.submit')}
         </button>
       </div>

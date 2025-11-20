@@ -63,6 +63,32 @@ const toNumber = (value: unknown): number | undefined => {
   return undefined;
 };
 
+const toSafeString = (value: unknown, fallback: string): string => {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : fallback;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const candidate =
+      record.name ??
+      record.label ??
+      record.type ??
+      record.id ??
+      record.key;
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      if (trimmed.length > 0) {
+        return trimmed;
+      }
+    }
+  }
+  return fallback;
+};
+
 const normalizeFeatures = (dataset: DatasetDetail): NormalizedFeature[] => {
   // 性能优化：动态调整最大特征数
   const adaptiveMaxFeatures = dataset.features.length > 10000 ? MAX_FEATURES * 2 : MAX_FEATURES;
@@ -111,8 +137,8 @@ const normalizeFeatures = (dataset: DatasetDetail): NormalizedFeature[] => {
     const safeStop = stop ?? start ?? safeStart;
 
     return {
-      name: record.name?.toString() ?? record.label?.toString() ?? `Feature ${index + 1}`,
-      type: record.type?.toString() ?? record.source?.toString() ?? 'feature',
+      name: toSafeString(record.name ?? record.label, `Feature ${index + 1}`),
+      type: toSafeString(record.type ?? record.source, 'feature'),
       start: Math.max(0, Math.min(safeStart, safeStop)),
       stop: Math.max(safeStart, safeStop),
       strand: typeof record.strand === 'number' ? Number(record.strand) : 1,

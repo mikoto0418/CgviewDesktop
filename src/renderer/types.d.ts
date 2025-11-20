@@ -36,6 +36,8 @@ declare global {
       selectFile: (filters?: Array<{ name: string; extensions: string[] }>) => Promise<string | null>;
       listProjects: () => Promise<ProjectSummary[]>;
       createProject: (input: CreateProjectInput) => Promise<ProjectSummary>;
+      updateProject: (projectId: string, input: Partial<CreateProjectInput>) => Promise<ProjectSummary>;
+      deleteProject: (projectId: string) => Promise<void>;
       getProject: (projectId: string) => Promise<ProjectSummary | null>;
       getActiveProjectId: () => Promise<string | null>;
       setActiveProjectId: (projectId: string | null) => Promise<void>;

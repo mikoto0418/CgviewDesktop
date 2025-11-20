@@ -43,6 +43,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
 
   constructor(private readonly options: SQLiteAdapterOptions) {}
 
+
   public async init(): Promise<void> {
     if (this.db) {
       return;
@@ -73,10 +74,10 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       : null;
 
     this.db = databaseBinary
-      ? new this.sql.Database(databaseBinary)
-      : new this.sql.Database();
+      ? new this.sql!.Database(databaseBinary)
+      : new this.sql!.Database();
 
-    this.db.exec('PRAGMA foreign_keys = ON;');
+    this.db!.exec('PRAGMA foreign_keys = ON;');
     this.ensureMigrationsTable();
     await this.runPendingMigrations();
     this.persist();
@@ -84,7 +85,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
 
   public async listProjects(): Promise<ProjectSummary[]> {
     this.assertInitialized();
-    const statement = this.db.prepare(
+    const statement = this.db!.prepare(
       `SELECT id, name, description, created_at, updated_at
        FROM projects
        ORDER BY datetime(created_at) DESC;`
@@ -101,7 +102,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
 
   public async getProjectById(id: string): Promise<ProjectSummary | null> {
     this.assertInitialized();
-    const statement = this.db.prepare(
+    const statement = this.db!.prepare(
       `SELECT id, name, description, created_at, updated_at
        FROM projects
        WHERE id = ?
@@ -127,7 +128,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
     const id = randomUUID();
     const description = input.description ?? null;
 
-    const insert = this.db.prepare(
+    const insert = this.db!.prepare(
       `INSERT INTO projects (id, name, description, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?);`
     );
@@ -146,37 +147,106 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
     };
   }
 
+
+  public async updateProject(
+    projectId: string,
+    input: Partial<CreateProjectInput>
+  ): Promise<ProjectSummary> {
+    this.assertInitialized();
+
+    // 首先检查项目是否存在
+    const existing = await this.getProjectById(projectId);
+    if (!existing) {
+      throw new Error(`Project ${projectId} does not exist.`);
+    }
+
+    const now = new Date().toISOString();
+    const name = input.name !== undefined ? input.name.trim() : existing.name;
+    const description = input.description !== undefined 
+      ? (input.description?.trim() || null) 
+      : existing.description;
+
+    if (!name || name.length === 0) {
+      throw new Error('Project name cannot be empty.');
+    }
+
+    const update = this.db!.prepare(
+      `UPDATE projects 
+       SET name = ?, description = ?, updated_at = ?
+       WHERE id = ?;`
+    );
+
+    update.run([name, description, now, projectId]);
+    update.free();
+
+    this.persist();
+
+    return {
+      id: projectId,
+      name,
+      description,
+      createdAt: existing.createdAt,
+      updatedAt: now
+    };
+  }
+
+  public async deleteProject(projectId: string): Promise<void> {
+    this.assertInitialized();
+
+    // 检查项目是否存在
+    const existing = await this.getProjectById(projectId);
+    if (!existing) {
+      throw new Error(`Project ${projectId} does not exist.`);
+    }
+
+    this.db!.run('BEGIN TRANSACTION;');
+    try {
+      // 删除项目（外键级联会自动删除关联的数据集和特征）
+      const statement = this.db!.prepare('DELETE FROM projects WHERE id = ?;');
+      statement.run([projectId]);
+      statement.free();
+      
+      this.db!.run('COMMIT;');
+    } catch (error) {
+      this.db!.run('ROLLBACK;');
+      throw error;
+    }
+
+    this.persist();
+  }
+
+
   public async createDataset(
     dataset: PersistedDataset
   ): Promise<DatasetSummary> {
     this.assertInitialized();
 
     let resolvedDisplayName = basename(dataset.sourcePath);
-    this.db.run('BEGIN TRANSACTION;');
-    try {
-      const trimmedName =
-        typeof dataset.displayName === 'string' ? dataset.displayName.trim() : '';
-      if (trimmedName.length > 0) {
-        resolvedDisplayName = trimmedName;
-      }
+    const trimmedName =
+      typeof dataset.displayName === 'string' ? dataset.displayName.trim() : '';
+    if (trimmedName.length > 0) {
+      resolvedDisplayName = trimmedName;
+    }
 
-      const insert = this.db.prepare(
+    const normalizedFeatureStates = normalizeFeatureStates(
+      dataset.featureStates ?? {}
+    );
+    const normalizedPlotTracks = normalizePlotTracks(
+      dataset.plotTracks ?? []
+    );
+    const normalizedLinkTracks = normalizeLinkTracks(
+      dataset.linkTracks ?? []
+    );
+    const statistics =
+      dataset.statistics ?? computeDatasetStatistics(dataset.features);
+
+    this.db!.run('BEGIN TRANSACTION;');
+    try {
+      const insert = this.db!.prepare(
         `INSERT INTO datasets (
           id, project_id, file_name, file_type, status, metadata_json, imported_at, display_name
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`
       );
-
-      const normalizedFeatureStates = normalizeFeatureStates(
-        dataset.featureStates ?? {}
-      );
-      const normalizedPlotTracks = normalizePlotTracks(
-        dataset.plotTracks ?? []
-      );
-      const normalizedLinkTracks = normalizeLinkTracks(
-        dataset.linkTracks ?? []
-      );
-      const statistics =
-        dataset.statistics ?? computeDatasetStatistics(dataset.features);
 
       insert.run([
         dataset.id,
@@ -198,9 +268,9 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
 
       this.insertDatasetFeatures(dataset.id, dataset.features);
 
-      this.db.run('COMMIT;');
+      this.db!.run('COMMIT;');
     } catch (error) {
-      this.db.run('ROLLBACK;');
+      this.db!.run('ROLLBACK;');
       throw error;
     }
 
@@ -216,16 +286,16 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       organism: dataset.meta.organism,
       totalLength: dataset.meta.totalLength,
       createdAt: dataset.createdAt,
-      featureStates: normalizeFeatureStates(dataset.featureStates ?? {}),
-      plotTracks: normalizePlotTracks(dataset.plotTracks ?? []),
-      linkTracks: normalizeLinkTracks(dataset.linkTracks ?? []),
+      featureStates: normalizedFeatureStates,
+      plotTracks: normalizedPlotTracks,
+      linkTracks: normalizedLinkTracks,
       statistics
     };
   }
 
   public async listDatasets(projectId: string): Promise<DatasetSummary[]> {
     this.assertInitialized();
-    const statement = this.db.prepare(
+    const statement = this.db!.prepare(
       `SELECT id, project_id, file_name, file_type, metadata_json, imported_at, display_name
        FROM datasets
        WHERE project_id = ?
@@ -244,7 +314,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
 
   public async getDatasetDetail(datasetId: string): Promise<DatasetDetail | null> {
     this.assertInitialized();
-    const datasetStmt = this.db.prepare(
+    const datasetStmt = this.db!.prepare(
       `SELECT id, project_id, file_name, file_type, metadata_json, imported_at, display_name
        FROM datasets
        WHERE id = ?
@@ -263,7 +333,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       return null;
     }
 
-    const featuresStmt = this.db.prepare(
+    const featuresStmt = this.db!.prepare(
       `SELECT payload_json
        FROM dataset_features
        WHERE dataset_id = ?
@@ -297,17 +367,14 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
   public async deleteDataset(datasetId: string): Promise<void> {
     this.assertInitialized();
 
-    this.db.run('BEGIN TRANSACTION;');
+    this.db!.run('BEGIN TRANSACTION;');
     try {
-      const statement = this.db.prepare(
-        `DELETE FROM datasets
-         WHERE id = ?;`
-      );
+      const statement = this.db!.prepare('DELETE FROM datasets WHERE id = ?;');
       statement.run([datasetId]);
       statement.free();
-      this.db.run('COMMIT;');
+      this.db!.run('COMMIT;');
     } catch (error) {
-      this.db.run('ROLLBACK;');
+      this.db!.run('ROLLBACK;');
       throw error;
     }
 
@@ -320,7 +387,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
     const trimmed = displayName.trim();
     const value = trimmed.length > 0 ? trimmed : null;
 
-    const statement = this.db.prepare(
+    const statement = this.db!.prepare(
       `UPDATE datasets
          SET display_name = ?
        WHERE id = ?;`
@@ -337,9 +404,9 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
   ): Promise<void> {
     this.assertInitialized();
 
-    this.db.run('BEGIN TRANSACTION;');
+    this.db!.run('BEGIN TRANSACTION;');
     try {
-      const statement = this.db.prepare(
+      const statement = this.db!.prepare(
         `SELECT metadata_json
            FROM datasets
           WHERE id = ?
@@ -369,7 +436,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       metadata.plotTracks = normalizePlotTracks(metadata['plotTracks']);
       metadata.linkTracks = normalizeLinkTracks(metadata['linkTracks']);
 
-      const update = this.db.prepare(
+      const update = this.db!.prepare(
         `UPDATE datasets
            SET metadata_json = ?
          WHERE id = ?;`
@@ -377,10 +444,10 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       update.run([JSON.stringify(metadata), datasetId]);
       update.free();
 
-      this.db.run('COMMIT;');
+      this.db!.run('COMMIT;');
       this.persist();
     } catch (error) {
-      this.db.run('ROLLBACK;');
+      this.db!.run('ROLLBACK;');
       throw error;
     }
   }
@@ -391,9 +458,9 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
   ): Promise<void> {
     this.assertInitialized();
 
-    this.db.run('BEGIN TRANSACTION;');
+    this.db!.run('BEGIN TRANSACTION;');
     try {
-      const statement = this.db.prepare(
+      const statement = this.db!.prepare(
         `SELECT metadata_json
            FROM datasets
           WHERE id = ?
@@ -425,7 +492,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       );
       metadata.linkTracks = normalizeLinkTracks(metadata['linkTracks']);
 
-      const update = this.db.prepare(
+      const update = this.db!.prepare(
         `UPDATE datasets
            SET metadata_json = ?
          WHERE id = ?;`
@@ -433,10 +500,10 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       update.run([JSON.stringify(metadata), datasetId]);
       update.free();
 
-      this.db.run('COMMIT;');
+      this.db!.run('COMMIT;');
       this.persist();
     } catch (error) {
-      this.db.run('ROLLBACK;');
+      this.db!.run('ROLLBACK;');
       throw error;
     }
   }
@@ -447,9 +514,9 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
   ): Promise<void> {
     this.assertInitialized();
 
-    this.db.run('BEGIN TRANSACTION;');
+    this.db!.run('BEGIN TRANSACTION;');
     try {
-      const statement = this.db.prepare(
+      const statement = this.db!.prepare(
         `SELECT metadata_json
            FROM datasets
           WHERE id = ?
@@ -481,7 +548,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       );
       metadata.plotTracks = normalizePlotTracks(metadata['plotTracks']);
 
-      const update = this.db.prepare(
+      const update = this.db!.prepare(
         `UPDATE datasets
            SET metadata_json = ?
          WHERE id = ?;`
@@ -489,17 +556,17 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       update.run([JSON.stringify(metadata), datasetId]);
       update.free();
 
-      this.db.run('COMMIT;');
+      this.db!.run('COMMIT;');
       this.persist();
     } catch (error) {
-      this.db.run('ROLLBACK;');
+      this.db!.run('ROLLBACK;');
       throw error;
     }
   }
 
   public async getActiveProjectId(): Promise<string | null> {
     this.assertInitialized();
-    const statement = this.db.prepare(
+    const statement = this.db!.prepare(
       `SELECT value_json
        FROM preferences
        WHERE scope = ? AND key = ?
@@ -530,9 +597,9 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
   public async setActiveProjectId(projectId: string | null): Promise<void> {
     this.assertInitialized();
 
-    this.db.run('BEGIN IMMEDIATE TRANSACTION;');
+    this.db!.run('BEGIN IMMEDIATE TRANSACTION;');
     try {
-      const deleteStmt = this.db.prepare(
+      const deleteStmt = this.db!.prepare(
         `DELETE FROM preferences
          WHERE scope = ? AND key = ?;`
       );
@@ -545,7 +612,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
           throw new Error(`Project ${projectId} does not exist.`);
         }
 
-        const insertStmt = this.db.prepare(
+        const insertStmt = this.db!.prepare(
           `INSERT INTO preferences
              (id, scope, key, value_json, project_id, updated_at)
            VALUES (?, ?, ?, ?, ?, datetime('now'));`
@@ -561,10 +628,10 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
         insertStmt.free();
       }
 
-      this.db.run('COMMIT;');
+      this.db!.run('COMMIT;');
       this.persist();
     } catch (error) {
-      this.db.run('ROLLBACK;');
+      this.db!.run('ROLLBACK;');
       throw error;
     }
   }
@@ -575,14 +642,14 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
     }
 
     this.persist();
-    this.db.close();
+    this.db!.close();
     this.db = null;
     this.sql = null;
   }
 
   private ensureMigrationsTable(): void {
     this.assertInitialized();
-    this.db.exec(
+    this.db!.exec(
       `CREATE TABLE IF NOT EXISTS __migrations (
         id TEXT PRIMARY KEY,
         applied_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -594,7 +661,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
     this.assertInitialized();
 
     const applied = new Set<string>();
-    const statement = this.db.prepare('SELECT id FROM __migrations;');
+    const statement = this.db!.prepare('SELECT id FROM __migrations;');
     while (statement.step()) {
       const row = statement.get() as unknown[];
       if (row[0]) {
@@ -608,20 +675,20 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
         continue;
       }
 
-      this.db.run('BEGIN TRANSACTION;');
+      this.db!.run('BEGIN TRANSACTION;');
       try {
         for (const sql of migration.statements) {
-          this.db.exec(sql);
+          this.db!.exec(sql);
         }
-        const insert = this.db.prepare(
+        const insert = this.db!.prepare(
           `INSERT INTO __migrations (id, applied_at)
            VALUES (?, datetime('now'));`
         );
         insert.run([migration.id]);
         insert.free();
-        this.db.run('COMMIT;');
+        this.db!.run('COMMIT;');
       } catch (error) {
-        this.db.run('ROLLBACK;');
+        this.db!.run('ROLLBACK;');
         throw error;
       }
     }
@@ -629,7 +696,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
 
   private persist(): void {
     this.assertInitialized();
-    const binary = this.db.export();
+    const binary = this.db!.export();
     writeFileSync(this.options.databaseFile, Buffer.from(binary));
   }
 
@@ -736,7 +803,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
       return;
     }
 
-    const statement = this.db.prepare(
+    const statement = this.db!.prepare(
       `INSERT INTO dataset_features (
         id, dataset_id, feature_index, payload_json
       ) VALUES (?, ?, ?, ?);`
@@ -754,10 +821,7 @@ export class SQLitePersistenceAdapter implements PersistenceAdapter {
     statement.free();
   }
 
-  private assertInitialized(): asserts this is {
-    db: Database;
-    sql: SqlJsStatic;
-  } {
+  private assertInitialized(): void {
     if (!this.db || !this.sql) {
       throw new Error('SQLitePersistenceAdapter is not initialized.');
     }
