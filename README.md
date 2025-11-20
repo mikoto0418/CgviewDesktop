@@ -208,8 +208,7 @@ npm run build:linux
 
 ## 📞 联系方式
 
-- 问题反馈：[GitHub Issues](https://github.com/yourusername/cgviewtest/issues)
-- 邮件：your.email@example.com
+- 问题反馈：[GitHub Issues](https://github.com/mikoto0418/CgviewDesktop/issues)
 
 ---
 
